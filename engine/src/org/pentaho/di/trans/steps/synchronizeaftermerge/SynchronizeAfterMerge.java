@@ -141,7 +141,9 @@ public class SynchronizeAfterMerge extends BaseStep implements StepInterface
 				data.db.setValues(data.insertRowMeta, insertRowData, data.insertStatement);
 				data.db.insertRow(data.insertStatement,data.batchMode);
 				performInsert=true;
-				incrementLinesOutput();
+        //hide it here as the actual number of output rows is calculated when they are committed 
+        // incrementLinesOutput();
+
 				if (log.isRowLevel()) logRowlevel("Written row: "+data.insertRowMeta.getString(insertRowData));
 				
 			}else
@@ -512,8 +514,10 @@ public class SynchronizeAfterMerge extends BaseStep implements StepInterface
                     {
                         Object[] rowb = data.batchBuffer.get(i);
                         putRow(data.outputRowMeta, rowb);
+            if ( data.inputRowMeta.getString( rowb, data.indexOfOperationOrderField ).equals( data.insertValue ) ) {
                         incrementLinesOutput();
                     }
+          }
                     // Clear the buffer
                     data.batchBuffer.clear();
                 }
