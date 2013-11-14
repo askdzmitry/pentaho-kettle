@@ -993,8 +993,10 @@ public class SynchronizeAfterMerge extends BaseStep implements StepInterface
 	            {
 	                Object[] row = data.batchBuffer.get(i);
 	                putRow(data.outputRowMeta, row);
-	                incrementLinesOutput();
-	            }
+          			if ( data.inputRowMeta.getString( row, data.indexOfOperationOrderField ).equals( data.insertValue ) ) {
+	                	incrementLinesOutput();
+	            	}
+        		}
 	            // Clear the buffer
 	            data.batchBuffer.clear();            
 			}
