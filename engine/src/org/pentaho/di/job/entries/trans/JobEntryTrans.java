@@ -574,7 +574,7 @@ public class JobEntryTrans extends JobEntryBase implements Cloneable, JobEntryIn
         return result;
       }
       // create parent folder?
-      if (!createParentFolder(realLogFilename)) {
+      if ( !FileUtil.createParentFolder( PKG, realLogFilename, createParentFolder, this.getLogChannel(), this ) ) {
         result.setNrErrors(1);
         result.setResult(false);
         return result;
