@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
 
+import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.step.BaseStepData;
 import org.pentaho.di.trans.step.StepDataInterface;
@@ -43,10 +44,10 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
   public RowMetaInterface convertRowMeta;
   public RowMetaInterface outputRowMeta;
 
-  public byte[] byteBuffer;
-  public int startBuffer;
-  public int endBuffer;
-  public int bufferSize;
+  private byte[] byteBuffer;
+  private int startBuffer;
+  private int endBuffer;
+  private int bufferSize;
 
   public byte[] delimiter;
   public byte[] enclosure;
@@ -56,7 +57,6 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
   public int filenr;
   public int startFilenr;
   public byte[] binaryFilename;
-  public long fileSize;
   public FileInputStream fis;
 
   public boolean isAddingRowNumber;
@@ -82,8 +82,10 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
   public CrLfMatcherInterface crLfMatcher;
 
   /**
-	 *
-	 */
+   * Data class for CsvInput step
+   *
+   * @see CsvInput
+   */
   public CsvInputData() {
     super();
     byteBuffer = new byte[] {};
@@ -93,7 +95,7 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
   }
 
   // Resize
-  public void resizeByteBufferArray() {
+  private void resizeByteBufferArray() {
     // What's the new size?
     // It's (endBuffer-startBuffer)+size !!
     // That way we can at least read one full block of data using NIO
@@ -114,7 +116,7 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
     endBuffer = bufferSize;
   }
 
-  public int readBufferFromFile() throws IOException {
+  private int readBufferFromFile() throws IOException {
     // See if the line is not longer than the buffer.
     // In that case we need to increase the size of the byte buffer.
     // Since this method doesn't get called every other character, I'm sure we can spend a bit of time here without
@@ -157,19 +159,15 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
   }
 
   /**
-   * Increase the endBuffer pointer by one.<br>
-   * If there is not enough room in the buffer to go there, resize the byte buffer and read more data.<br>
-   * if there is no more data to read and if the endBuffer pointer has reached the end of the byte buffer, we return
-   * true.<br>
+   * Check to see if the buffer size is large enough given the data.endBuffer pointer.<br>
+   * Resize the buffer if there is not enough room.
    *
-   * @return true if we reached the end of the byte buffer.
+   * @return false if everything is OK, true if there is a problem and we should stop.
    * @throws IOException
-   *           In case we get an error reading from the input file.
+   *           in case there is a I/O problem (read error)
    */
-  public boolean increaseEndBuffer() throws IOException {
-    endBuffer++;
-
-    if ( endBuffer >= bufferSize ) {
+  boolean resizeBufferIfNeeded() throws IOException {
+    if ( endOfBuffer() ) {
       // Oops, we need to read more data...
       // Better resize this before we read other things in it...
       //
@@ -179,12 +177,35 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
       //
       int n = readBufferFromFile();
 
-      // Return true we didn't manage to read anything and we reached the end of the buffer...
+      // If we didn't manage to read something, we return true to indicate we're done
       //
       return n < 0;
     }
 
     return false;
+  }
+
+  /**
+   * Moves the endBuffer pointer by one.<br>
+   * If there is not enough room in the buffer to go there, resize the byte buffer and read more data.<br>
+   * if there is no more data to read and if the endBuffer pointer has reached the end of the byte buffer, we return
+   * true.<br>
+   *
+   * @return true if we reached the end of the byte buffer.
+   * @throws IOException
+   *           In case we get an error reading from the input file.
+   */
+  boolean moveEndBufferPointer() throws IOException {
+    // In case of 2-byte encoding we need to position endBuffer at even byte (1)
+    if ( endBuffer == 0 ) {
+      endBuffer++;
+      totalBytesRead++;
+    } else {
+      endBuffer += encodingType.getLength();
+      totalBytesRead += encodingType.getLength();
+    }
+
+    return resizeBufferIfNeeded();
   }
 
   /**
@@ -196,24 +217,104 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
    *
    * @return the byte array with escaped enclosures escaped.
    */
-  public byte[] removeEscapedEnclosures( byte[] field, int nrEnclosuresFound ) {
+  byte[] removeEscapedEnclosures( byte[] field, int nrEnclosuresFound ) {
     byte[] result = new byte[field.length - nrEnclosuresFound];
     int resultIndex = 0;
     for ( int i = 0; i < field.length; i++ ) {
-      if ( field[i] == enclosure[0] ) {
-        if ( i + 1 < field.length && field[i + 1] == enclosure[0] ) {
-          // field[i]+field[i+1] is an escaped enclosure...
-          // so we ignore this one
-          // field[i+1] will be picked up on the next iteration.
-        } else {
-          // Not an escaped enclosure...
-          result[resultIndex++] = field[i];
-        }
-      } else {
-        result[resultIndex++] = field[i];
+      result[resultIndex++] = field[i];
+      if ( field[i] == enclosure[0] && i + 1 < field.length && field[i + 1] == enclosure[0] ) {
+        // Skip the escaped enclosure after adding the first one
+        i++;
       }
     }
     return result;
   }
 
+  byte[] getField( boolean delimiterFound, boolean enclosureFound, boolean newLineFound, boolean endOfBuffer ) {
+    int length = calculateFieldLength( delimiterFound, enclosureFound, newLineFound, endOfBuffer );
+
+    byte[] field = new byte[length];
+    System.arraycopy( byteBuffer, startBuffer, field, 0, length );
+
+    return field;
+  }
+
+  private int calculateFieldLength( boolean delimiterFound, boolean enclosureFound, boolean newLineFound,
+      boolean endOfBuffer ) {
+    int length = endBuffer - startBuffer;
+
+    if ( newLineFound ) {
+      length -= encodingType.getLength() * 2 - 1;
+      if ( endOfBuffer ) {
+        startBuffer += encodingType.getLength(); // offset for the enclosure in last field before EOF
+      }
+    }
+
+    if ( enclosureFound ) {
+      if ( length > 1 ) {
+        length -= delimiter.length;
+      }
+
+      startBuffer = startBuffer + enclosure.length;
+      length -= enclosure.length;
+
+      // Lets get rid of the delimiter, if it is still in the range and spaces between it and the enclosure.
+      while ( ( byteBuffer[startBuffer + length] == 32 ) || ( byteBuffer[startBuffer + length] == delimiter[0] ) ) {
+        length -= 1;
+      }
+
+      length -= enclosure.length - 1;
+    }
+
+    if ( delimiterFound ) {
+      length -= delimiter.length - 1;
+    }
+
+    if ( length <= 0 ) {
+      length = 0;
+    }
+
+    return length;
+  }
+
+  void closeFile() throws KettleException {
+    try {
+      if ( fc != null ) {
+        fc.close();
+      }
+      if ( fis != null ) {
+        fis.close();
+      }
+    } catch ( IOException e ) {
+      throw new KettleException( "Unable to close file channel for file '" + filenames[filenr - 1], e );
+    }
+  }
+
+  int getStartBuffer() {
+    return startBuffer;
+  }
+
+  void setStartBuffer( int startBuffer ) {
+    this.startBuffer = startBuffer;
+  }
+
+  int getEndBuffer() {
+    return endBuffer;
+  }
+
+  boolean newLineFound() {
+    return crLfMatcher.isReturn( byteBuffer, endBuffer ) || crLfMatcher.isLineFeed( byteBuffer, endBuffer );
+  }
+
+  boolean delimiterFound() {
+    return delimiterMatcher.matchesPattern( byteBuffer, endBuffer, delimiter );
+  }
+
+  boolean enclosureFound() {
+    return enclosureMatcher.matchesPattern( byteBuffer, endBuffer, enclosure );
+  }
+
+  boolean endOfBuffer() {
+    return endBuffer >= bufferSize;
+  }
 }

@@ -139,7 +139,8 @@ public class CsvInput extends BaseStep implements StepInterface {
 
     try {
       Object[] outputRowData = readOneRow( true ); // get row, set busy!
-      if ( outputRowData == null ) { // no more input to be expected...
+      // no more input to be expected...
+      if ( outputRowData == null ) {
         if ( openNextFile() ) {
           return true; // try again on the next loop...
         } else {
@@ -156,8 +157,8 @@ public class CsvInput extends BaseStep implements StepInterface {
       }
     } catch ( KettleConversionException e ) {
       if ( getStepMeta().isDoingErrorHandling() ) {
-        StringBuffer errorDescriptions = new StringBuffer( 100 );
-        StringBuffer errorFields = new StringBuffer( 50 );
+        StringBuilder errorDescriptions = new StringBuilder( 100 );
+        StringBuilder errorFields = new StringBuilder( 50 );
         for ( int i = 0; i < e.getCauses().size(); i++ ) {
           if ( i > 0 ) {
             errorDescriptions.append( ", " );
@@ -308,13 +309,7 @@ public class CsvInput extends BaseStep implements StepInterface {
 
       // Close the previous file...
       //
-      if ( data.fc != null ) {
-        data.fc.close();
-      }
-
-      if ( data.fis != null ) {
-        data.fis.close();
-      }
+      data.closeFile();
 
       if ( data.filenr >= data.filenames.length ) {
         return false;
@@ -366,8 +361,8 @@ public class CsvInput extends BaseStep implements StepInterface {
       // - If you're running in parallel, if a header row is checked, if you're at the beginning of a file
       //
       if ( meta.isHeaderPresent() ) {
-        if ( ( !data.parallel ) || // Standard flat file : skip header
-            ( data.parallel && data.bytesToSkipInFirstFile <= 0 ) ) {
+        // Standard flat file : skip header
+        if ( !data.parallel || data.bytesToSkipInFirstFile <= 0 ) {
           readOneRow( false ); // skip this row.
           logBasic( BaseMessages.getString( PKG, "CsvInput.Log.HeaderRowSkipped", data.filenames[data.filenr - 1] ) );
         }
@@ -390,56 +385,6 @@ public class CsvInput extends BaseStep implements StepInterface {
   }
 
   /**
-   * Check to see if the buffer size is large enough given the data.endBuffer pointer.<br>
-   * Resize the buffer if there is not enough room.
-   *
-   * @return false if everything is OK, true if there is a problem and we should stop.
-   * @throws IOException
-   *           in case there is a I/O problem (read error)
-   */
-  private boolean checkBufferSize() throws IOException {
-    if ( data.endBuffer >= data.bufferSize ) {
-      // Oops, we need to read more data...
-      // Better resize this before we read other things in it...
-      //
-      data.resizeByteBufferArray();
-
-      // Also read another chunk of data, now that we have the space for it...
-      //
-      int n = data.readBufferFromFile();
-
-      // If we didn't manage to read something, we return true to indicate we're done
-      //
-      return n < 0;
-    }
-    return false;
-  }
-
-  /*
-   * private boolean isReturn(byte[] source, int location) { switch (data.encodingType) { case SINGLE: return
-   * source[location] == '\n';
-   *
-   * case DOUBLE_BIG_ENDIAN: if (location >= 1) { return source[location - 1] == 0 && source[location] == 0x0d; } else {
-   * return false; }
-   *
-   * case DOUBLE_LITTLE_ENDIAN: if (location >= 1) { return source[location - 1] == 0x0d && source[location] == 0x00; }
-   * else { return false; }
-   *
-   * default: return source[location] == '\n'; } }
-   *
-   * private boolean isLineFeed(byte[] source, int location) { switch (data.encodingType) { case SINGLE: return
-   * source[location] == '\r';
-   *
-   * case DOUBLE_BIG_ENDIAN: if (location >= 1) { return source[location - 1] == 0 && source[location] == 0x0a; } else {
-   * return false; }
-   *
-   * case DOUBLE_LITTLE_ENDIAN: if (location >= 1) { return source[location - 1] == 0x0a && source[location] == 0x00; }
-   * else { return false; }
-   *
-   * default: return source[location] == '\r'; } }
-   */
-
-  /**
    * Read a single row of data from the file...
    *
    * @param doConversions
@@ -455,7 +400,8 @@ public class CsvInput extends BaseStep implements StepInterface {
       int outputIndex = 0;
       boolean newLineFound = false;
       boolean endOfBuffer = false;
-      int newLines = 0;
+      // Characters to compensate while computing data.startBuffer value
+      int charsAhead = 0;
       List<Exception> conversionExceptions = null;
       List<ValueMetaInterface> exceptionFields = null;
 
@@ -470,14 +416,14 @@ public class CsvInput extends BaseStep implements StepInterface {
       //
       while ( !newLineFound && outputIndex < meta.getInputFields().length ) {
 
-        if ( checkBufferSize() ) {
+        if ( data.resizeBufferIfNeeded() ) {
           // Last row was being discarded if the last item is null and
           // there is no end of line delimiter
           if ( outputRowData != null ) {
             // Make certain that at least one record exists before
             // filling the rest of them with null
             if ( outputIndex > 0 ) {
-              return ( outputRowData );
+              return outputRowData;
             }
           }
 
@@ -493,84 +439,47 @@ public class CsvInput extends BaseStep implements StepInterface {
         boolean delimiterFound = false;
         boolean enclosureFound = false;
         int escapedEnclosureFound = 0;
-        while ( !delimiterFound ) {
+        while ( !delimiterFound && !newLineFound ) {
           // If we find the first char, we might find others as well ;-)
           // Single byte delimiters only for now.
           //
-          if ( data.delimiterMatcher.matchesPattern( data.byteBuffer, data.endBuffer, data.delimiter ) ) {
+          if ( data.delimiterFound() ) {
             delimiterFound = true;
-          } else if ( ( !meta.isNewlinePossibleInFields() || outputIndex == meta.getInputFields().length - 1 )
-              && ( data.crLfMatcher.isReturn( data.byteBuffer, data.endBuffer ) || data.crLfMatcher.isLineFeed(
-                  data.byteBuffer, data.endBuffer ) ) ) {
             // Perhaps we found a (pre-mature) new line?
+            //
             // In case we are not using an enclosure and in case fields contain new lines
             // we need to make sure that we check the newlines possible flag.
             // If the flag is enable we skip newline checking except for the last field in the row.
             // In that one we can't support newlines without enclosure (handled below).
             //
-            if ( data.encodingType.equals( EncodingType.DOUBLE_LITTLE_ENDIAN )
-                || data.encodingType.equals( EncodingType.DOUBLE_BIG_ENDIAN ) ) {
-              data.endBuffer += 2;
-            } else {
-              data.endBuffer++;
-            }
-
-            data.totalBytesRead++;
-            newLines = 1;
-
-            if ( data.endBuffer >= data.bufferSize ) {
-              // Oops, we need to read more data...
-              // Better resize this before we read other things in it...
-              //
-              data.resizeByteBufferArray();
-
-              // Also read another chunk of data, now that we have the space for it...
-              // Ignore EOF, there might be other stuff in the buffer.
-              //
-              data.readBufferFromFile();
-            }
+          } else if ( ( !meta.isNewlinePossibleInFields() || outputIndex == meta.getInputFields().length - 1 )
+              && data.newLineFound() ) {
+            data.moveEndBufferPointer();
 
             // re-check for double delimiters...
-            if ( data.crLfMatcher.isReturn( data.byteBuffer, data.endBuffer )
-                || data.crLfMatcher.isLineFeed( data.byteBuffer, data.endBuffer ) ) {
-              data.endBuffer++;
-              data.totalBytesRead++;
-              newLines = 2;
-              if ( data.endBuffer >= data.bufferSize ) {
-                // Oops, we need to read more data...
-                // Better resize this before we read other things in it...
-                //
-                data.resizeByteBufferArray();
-
-                // Also read another chunk of data, now that we have the space for it...
-                // Ignore EOF, there might be other stuff in the buffer.
-                //
-                data.readBufferFromFile();
-              }
+            if ( data.newLineFound() ) {
+              charsAhead = 1;
             }
 
             newLineFound = true;
-            delimiterFound = true;
-          } else if ( data.enclosure != null
-              && data.enclosureMatcher.matchesPattern( data.byteBuffer, data.endBuffer, data.enclosure ) ) {
             // Perhaps we need to skip over an enclosed part?
             // We always expect exactly one enclosure character
             // If we find the enclosure doubled, we consider it escaped.
             // --> "" is converted to " later on.
             //
-
+          } else if ( data.enclosureFound() ) {
             enclosureFound = true;
             boolean keepGoing;
             do {
-              if ( data.increaseEndBuffer() ) {
+              if ( data.moveEndBufferPointer() ) {
                 enclosureFound = false;
                 break;
               }
-              keepGoing = !data.enclosureMatcher.matchesPattern( data.byteBuffer, data.endBuffer, data.enclosure );
+              keepGoing = !data.enclosureFound();
               if ( !keepGoing ) {
                 // We found an enclosure character.
                 // Read another byte...
-                if ( data.increaseEndBuffer() ) {
+                if ( data.moveEndBufferPointer() ) {
                   enclosureFound = false;
                   break;
                 }
@@ -578,7 +487,7 @@ public class CsvInput extends BaseStep implements StepInterface {
                 // If this character is also an enclosure, we can consider the enclosure "escaped".
                 // As such, if this is an enclosure, we keep going...
                 //
-                keepGoing = data.enclosureMatcher.matchesPattern( data.byteBuffer, data.endBuffer, data.enclosure );
+                keepGoing = data.enclosureFound();
                 if ( keepGoing ) {
                   escapedEnclosureFound++;
                 }
@@ -587,18 +496,15 @@ public class CsvInput extends BaseStep implements StepInterface {
 
             // Did we reach the end of the buffer?
             //
-            if ( data.endBuffer >= data.bufferSize ) {
+            if ( data.endOfBuffer() ) {
               newLineFound = true; // consider it a newline to break out of the upper while loop
-              newLines += 2; // to remove the enclosures in case of missing newline on last line.
+              charsAhead += 2; // to remove the enclosures in case of missing newline on last line.
               endOfBuffer = true;
               break;
             }
           } else {
-            data.endBuffer++;
-            data.totalBytesRead++;
-
-            if ( checkBufferSize() ) {
-              if ( data.endBuffer >= data.bufferSize ) {
+            if ( data.moveEndBufferPointer() ) {
+              if ( data.endOfBuffer() ) {
                 newLineFound = true;
                 break;
               }
@@ -606,7 +512,7 @@ public class CsvInput extends BaseStep implements StepInterface {
           }
         }
 
-        // If we're still here, we found a delimiter..
+        // If we're still here, we found a delimiter...
         // Since the starting point never changed really, we just can grab range:
         //
         // [startBuffer-endBuffer[
@@ -614,10 +520,8 @@ public class CsvInput extends BaseStep implements StepInterface {
         // This is the part we want.
         // data.byteBuffer[data.startBuffer]
         //
-        int length = calculateFieldLength( newLineFound, newLines, enclosureFound, endOfBuffer );
 
-        byte[] field = new byte[length];
-        System.arraycopy( data.byteBuffer, data.startBuffer, field, 0, length );
+        byte[] field = data.getField( delimiterFound, enclosureFound, newLineFound, endOfBuffer );
 
         // Did we have any escaped characters in there?
         //
@@ -663,21 +567,28 @@ public class CsvInput extends BaseStep implements StepInterface {
         // do-while loop below) and possibly skipping a newline character. This can occur if there is an
         // empty column at the end of the row (see the Jira case for details)
         if ( !newLineFound && outputIndex < meta.getInputFields().length ) {
-          data.endBuffer++;
-          data.totalBytesRead++;
+          data.moveEndBufferPointer();
         }
-        data.startBuffer = data.endBuffer;
+
+        if ( data.encodingType.getLength() == 2 ) {
+          // We need to position data.startBuffer correctly for cases where 1 or 2 new line chars were found
+          data.setStartBuffer( data.getEndBuffer() + charsAhead * data.encodingType.getLength() - 1 );
+          // Move data.endBuffer ahead if needed
+          if ( data.getStartBuffer() >= data.getEndBuffer() ) {
+            data.moveEndBufferPointer();
+          }
+        } else {
+          data.setStartBuffer( data.getEndBuffer() );
+        }
       }
 
       // See if we reached the end of the line.
       // If not, we need to skip the remaining items on the line until the next newline...
       //
-      if ( !newLineFound && !checkBufferSize() ) {
+      if ( !newLineFound && !data.resizeBufferIfNeeded() ) {
         do {
-          data.endBuffer++;
-          data.totalBytesRead++;
-
-          if ( checkBufferSize() ) {
+          data.moveEndBufferPointer();
+          if ( data.resizeBufferIfNeeded() ) {
             break; // nothing more to read.
           }
 
@@ -685,22 +596,19 @@ public class CsvInput extends BaseStep implements StepInterface {
           // fields. (imagine that)
           // In that particular case we want to use the same logic we use above (refactored a bit) to skip these fields.
 
-        } while ( !data.crLfMatcher.isReturn( data.byteBuffer, data.endBuffer )
-            && !data.crLfMatcher.isLineFeed( data.byteBuffer, data.endBuffer ) );
+        } while ( !data.newLineFound() );
 
-        if ( !checkBufferSize() ) {
-          while ( data.crLfMatcher.isReturn( data.byteBuffer, data.endBuffer )
-              || data.crLfMatcher.isLineFeed( data.byteBuffer, data.endBuffer ) ) {
-            data.endBuffer++;
-            data.totalBytesRead++;
-            if ( checkBufferSize() ) {
+        if ( !data.resizeBufferIfNeeded() ) {
+          while ( data.newLineFound() ) {
+            data.moveEndBufferPointer();
+            if ( data.resizeBufferIfNeeded() ) {
               break; // nothing more to read.
             }
           }
         }
 
         // Make sure we start at the right position the next time around.
-        data.startBuffer = data.endBuffer;
+        data.setStartBuffer( data.getEndBuffer() );
       }
 
       // Optionally add the current filename to the mix as well...
@@ -714,7 +622,7 @@ public class CsvInput extends BaseStep implements StepInterface {
       }
 
       if ( data.isAddingRowNumber ) {
-        outputRowData[data.rownumFieldIndex] = new Long( data.rowNumber++ );
+        outputRowData[data.rownumFieldIndex] = data.rowNumber++;
       }
 
       incrementLinesInput();
@@ -729,57 +637,9 @@ public class CsvInput extends BaseStep implements StepInterface {
       return outputRowData;
     } catch ( KettleConversionException e ) {
       throw e;
-    } catch ( Exception e ) {
+    } catch ( IOException e ) {
       throw new KettleFileException( "Exception reading line using NIO", e );
     }
-
-  }
-
-  private int calculateFieldLength( boolean newLineFound, int newLines, boolean enclosureFound, boolean endOfBuffer ) {
-
-    int length = data.endBuffer - data.startBuffer;
-
-    if ( newLineFound ) {
-      length -= newLines;
-      if ( length <= 0 ) {
-        length = 0;
-      }
-      if ( endOfBuffer ) {
-        data.startBuffer++; // offset for the enclosure in last field
-      }
-      // before EOF
-    }
-
-    if ( enclosureFound ) {
-
-      if ( length > 1 ) {
-        length -= data.delimiter.length;
-      }
-
-      data.startBuffer = data.startBuffer + data.enclosure.length;
-      length -= data.enclosure.length;
-
-      // Lets get rid of the delimiter, if it is still in the range and
-      // spaces
-      // between it and the enclosure.
-      while ( ( data.byteBuffer[data.startBuffer + length] == 32 )
-          || ( data.byteBuffer[data.startBuffer + length] == data.delimiter[0] ) ) {
-
-        length -= 1;
-      }
-
-      length -= data.enclosure.length - 1;
-    }
-
-    if ( newLines <= 0 && data.delimiter.length > 1 ) {
-      length -= data.delimiter.length - 1;
-    }
-
-    if ( length <= 0 ) {
-      length = 0;
-    }
-
-    return length;
   }
 
   public boolean init( StepMetaInterface smi, StepDataInterface sdi ) {
@@ -818,8 +678,7 @@ public class CsvInput extends BaseStep implements StepInterface {
         if ( Const.isEmpty( meta.getEnclosure() ) ) {
           data.enclosure = null;
         } else {
-          data.enclosure =
-              data.encodingType.getBytes( environmentSubstitute( meta.getEnclosure() ), meta.getEncoding() );
+          data.enclosure = data.encodingType.getBytes( environmentSubstitute( meta.getEnclosure() ), meta.getEncoding() );
         }
 
       } catch ( UnsupportedEncodingException e ) {
@@ -884,32 +743,23 @@ public class CsvInput extends BaseStep implements StepInterface {
     return false;
   }
 
-  public void closeFile() throws KettleException {
-
-    try {
-      if ( data.fc != null ) {
-        data.fc.close();
-      }
-      if ( data.fis != null ) {
-        data.fis.close();
-      }
-    } catch ( IOException e ) {
-      throw new KettleException( "Unable to close file channel for file '" + data.filenames[data.filenr - 1], e );
-    }
-  }
-
   /**
    * This method is borrowed from TextFileInput
    *
    * @param log
+   *          logger
    * @param line
+   *          line to analyze
    * @param delimiter
+   *          delimiter used
    * @param enclosure
+   *          enclosure used
    * @param escapeCharacter
-   * @return
+   *          escape character used
+   * @return list of string detected
    * @throws KettleException
    */
-  public static final String[] guessStringsFromLine( LogChannelInterface log, String line, String delimiter,
+  public static String[] guessStringsFromLine( LogChannelInterface log, String line, String delimiter,
       String enclosure, String escapeCharacter ) throws KettleException {
     List<String> strings = new ArrayList<String>();
 
