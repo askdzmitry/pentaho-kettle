@@ -400,8 +400,8 @@ public class CsvInput extends BaseStep implements StepInterface {
       int outputIndex = 0;
       boolean newLineFound = false;
       boolean endOfBuffer = false;
-      // Characters to compensate while computing data.startBuffer value
-      int charsAhead = 0;
+      // Characters to skip while computing new data.startBuffer value
+      int charsToSkipInStartBuffer = 0;
       List<Exception> conversionExceptions = null;
       List<ValueMetaInterface> exceptionFields = null;
 
@@ -454,14 +454,16 @@ public class CsvInput extends BaseStep implements StepInterface {
             //
           } else if ( ( !meta.isNewlinePossibleInFields() || outputIndex == meta.getInputFields().length - 1 )
               && data.newLineFound() ) {
-            data.moveEndBufferPointer();
+            newLineFound = true;
 
-            // re-check for double delimiters...
+            // Skip new line character
+            data.moveEndBufferPointer();
+            // Re-check for double new line (\r\n)...
             if ( data.newLineFound() ) {
-              charsAhead = 1;
+              // Found another one, need to skip it later
+              charsToSkipInStartBuffer = 1;
             }
 
-            newLineFound = true;
             // Perhaps we need to skip over an enclosed part?
             // We always expect exactly one enclosure character
             // If we find the enclosure doubled, we consider it escaped.
@@ -498,7 +500,7 @@ public class CsvInput extends BaseStep implements StepInterface {
             //
             if ( data.endOfBuffer() ) {
               newLineFound = true; // consider it a newline to break out of the upper while loop
-              charsAhead += 2; // to remove the enclosures in case of missing newline on last line.
+              charsToSkipInStartBuffer += 2; // to remove the enclosures in case of missing newline on last line.
               endOfBuffer = true;
               break;
             }
@@ -570,15 +572,18 @@ public class CsvInput extends BaseStep implements StepInterface {
           data.moveEndBufferPointer();
         }
 
+        // Compute new data.startBuffer value, considering number of chars to skip
+        int newStartBuffer = data.getEndBuffer() + charsToSkipInStartBuffer * data.encodingType.getLength();
+        // In case of 2-byte long encoding we need to position start buffer at odd byte, move it 1 byte back
         if ( data.encodingType.getLength() == 2 ) {
-          // We need to position data.startBuffer correctly for cases where 1 or 2 new line chars were found
-          data.setStartBuffer( data.getEndBuffer() + charsAhead * data.encodingType.getLength() - 1 );
-          // Move data.endBuffer ahead if needed
-          if ( data.getStartBuffer() >= data.getEndBuffer() ) {
-            data.moveEndBufferPointer();
-          }
-        } else {
-          data.setStartBuffer( data.getEndBuffer() );
+          newStartBuffer--;
+        }
+
+        data.setStartBuffer( newStartBuffer );
+
+        // Move data.endBuffer ahead in case it's behind data.startBuffer
+        while ( data.getStartBuffer() > data.getEndBuffer() && !data.endOfBuffer() ) {
+          data.moveEndBufferPointer();
         }
       }
 
@@ -647,12 +652,10 @@ public class CsvInput extends BaseStep implements StepInterface {
     data = (CsvInputData) sdi;
 
     if ( super.init( smi, sdi ) ) {
-      // PDI-10242 see if a variable is used as encoding value
-      String realEncoding = environmentSubstitute( meta.getEncoding() );
       data.preferredBufferSize = Integer.parseInt( environmentSubstitute( meta.getBufferSize() ) );
 
       // If the step doesn't have any previous steps, we just get the filename.
-      // Otherwise, we'll grab the list of filenames later...
+      // Otherwise, we'll grab the list of file names later...
       //
       if ( getTransMeta().findNrPrevSteps( getStepMeta() ) == 0 ) {
         String filename = environmentSubstitute( meta.getFilename() );
@@ -670,17 +673,18 @@ public class CsvInput extends BaseStep implements StepInterface {
 
       data.totalBytesRead = 0L;
 
-      data.encodingType = EncodingType.guessEncodingType( realEncoding );
+      data.encodingType = EncodingType.guessEncodingType( meta.getEncoding() );
 
       // PDI-2489 - set the delimiter byte value to the code point of the
       // character as represented in the input file's encoding
       try {
-        data.delimiter = data.encodingType.getBytes( environmentSubstitute( meta.getDelimiter() ), realEncoding );
+        data.delimiter = data.encodingType.getBytes( environmentSubstitute( meta.getDelimiter() ), meta.getEncoding() );
 
         if ( Const.isEmpty( meta.getEnclosure() ) ) {
           data.enclosure = null;
         } else {
-          data.enclosure = data.encodingType.getBytes( environmentSubstitute( meta.getEnclosure() ), realEncoding );
+          data.enclosure =
+              data.encodingType.getBytes( environmentSubstitute( meta.getEnclosure() ), meta.getEncoding() );
         }
 
       } catch ( UnsupportedEncodingException e ) {
@@ -854,8 +858,8 @@ public class CsvInput extends BaseStep implements StepInterface {
           }
 
           if ( log.isRowLevel() ) {
-            log.logRowlevel(
-                BaseMessages.getString( PKG, "CsvInput.Log.ConvertLineToRowTitle" ), BaseMessages.getString( PKG, "CsvInput.Log.EndOfEnclosure", "" + p ) ); //$NON-NLS-3$
+            log.logRowlevel( BaseMessages.getString( PKG, "CsvInput.Log.ConvertLineToRowTitle" ), BaseMessages
+                .getString( PKG, "CsvInput.Log.EndOfEnclosure", "" + p ) ); //$NON-NLS-3$
           }
         } else {
           encl_found = false;
