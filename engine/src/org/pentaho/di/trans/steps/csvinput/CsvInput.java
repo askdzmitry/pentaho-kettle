@@ -131,14 +131,14 @@ public class CsvInput extends BaseStep implements StepInterface {
     // If we are running in parallel, make sure we don't read too much in this step copy...
     //
     if ( data.parallel ) {
-      if ( data.totalBytesRead > data.blockToRead ) {
+      if ( data.totalBytesRead >= data.blockToRead ) {
         setOutputDone(); // stop reading
         return false;
       }
     }
 
     try {
-      Object[] outputRowData = readOneRow( true ); // get row, set busy!
+      Object[] outputRowData = readOneRow( false, false ); // get row, set busy!
       // no more input to be expected...
       if ( outputRowData == null ) {
         if ( openNextFile() ) {
@@ -340,7 +340,7 @@ public class CsvInput extends BaseStep implements StepInterface {
 
           // Now, we need to skip the first row, until the first CR that is.
           //
-          readOneRow( false );
+          readOneRow( true, true );
         }
       }
 
@@ -363,7 +363,7 @@ public class CsvInput extends BaseStep implements StepInterface {
       if ( meta.isHeaderPresent() ) {
         // Standard flat file : skip header
         if ( !data.parallel || data.bytesToSkipInFirstFile <= 0 ) {
-          readOneRow( false ); // skip this row.
+          readOneRow( true, false ); // skip this row.
           logBasic( BaseMessages.getString( PKG, "CsvInput.Log.HeaderRowSkipped", data.filenames[data.filenr - 1] ) );
         }
       }
@@ -387,12 +387,14 @@ public class CsvInput extends BaseStep implements StepInterface {
   /**
    * Read a single row of data from the file...
    *
-   * @param doConversions
-   *          if you want to do conversions, set to false for the header row.
+   * @param skipRow
+   *          if row should be skipped: header row or part of row in case of parallel read
+   * @param ignoreEnclosures
+   *          if enclosures should be ignored, i.e. in case of we need to skip part of the row during parallel read
    * @return a row of data...
    * @throws KettleException
    */
-  private Object[] readOneRow( boolean doConversions ) throws KettleException {
+  private Object[] readOneRow( boolean skipRow, boolean ignoreEnclosures ) throws KettleException {
 
     try {
 
@@ -469,7 +471,7 @@ public class CsvInput extends BaseStep implements StepInterface {
             // If we find the enclosure doubled, we consider it escaped.
             // --> "" is converted to " later on.
             //
-          } else if ( data.enclosureFound() ) {
+          } else if ( data.enclosureFound() && !ignoreEnclosures ) {
             enclosureFound = true;
             boolean keepGoing;
             do {
@@ -534,7 +536,7 @@ public class CsvInput extends BaseStep implements StepInterface {
           field = data.removeEscapedEnclosures( field, escapedEnclosureFound );
         }
 
-        if ( doConversions ) {
+        if ( !skipRow ) {
           if ( meta.isLazyConversionActive() ) {
             outputRowData[outputIndex++] = field;
           } else {
@@ -630,7 +632,9 @@ public class CsvInput extends BaseStep implements StepInterface {
         outputRowData[data.rownumFieldIndex] = data.rowNumber++;
       }
 
-      incrementLinesInput();
+      if ( !ignoreEnclosures ) {
+        incrementLinesInput();
+      }
 
       if ( conversionExceptions != null && conversionExceptions.size() > 0 ) {
         // Forward the first exception
