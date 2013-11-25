@@ -196,14 +196,8 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
    *           In case we get an error reading from the input file.
    */
   boolean moveEndBufferPointer() throws IOException {
-    // In case of 2-byte encoding we need to position endBuffer at even byte (1)
-    if ( endBuffer == 0 ) {
-      endBuffer++;
-      totalBytesRead++;
-    } else {
-      endBuffer += encodingType.getLength();
-      totalBytesRead += encodingType.getLength();
-    }
+    endBuffer++;
+    totalBytesRead++;
 
     return resizeBufferIfNeeded();
   }
@@ -231,23 +225,12 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
   }
 
   byte[] getField( boolean delimiterFound, boolean enclosureFound, boolean newLineFound, boolean endOfBuffer ) {
-    int length = calculateFieldLength( delimiterFound, enclosureFound, newLineFound, endOfBuffer );
+    int fieldStart = startBuffer;
 
-    byte[] field = new byte[length];
-    System.arraycopy( byteBuffer, startBuffer, field, 0, length );
+    int length = endBuffer - fieldStart;
 
-    return field;
-  }
-
-  private int calculateFieldLength( boolean delimiterFound, boolean enclosureFound, boolean newLineFound,
-      boolean endOfBuffer ) {
-    int length = endBuffer - startBuffer;
-
-    if ( newLineFound ) {
+    if ( newLineFound && !endOfBuffer ) {
       length -= encodingType.getLength() * 2 - 1;
-      if ( endOfBuffer ) {
-        startBuffer += encodingType.getLength(); // offset for the enclosure in last field before EOF
-      }
     }
 
     if ( enclosureFound ) {
@@ -255,11 +238,11 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
         length -= delimiter.length;
       }
 
-      startBuffer = startBuffer + enclosure.length;
+      fieldStart += enclosure.length;
       length -= enclosure.length;
 
       // Lets get rid of the delimiter, if it is still in the range and spaces between it and the enclosure.
-      while ( ( byteBuffer[startBuffer + length] == 32 ) || ( byteBuffer[startBuffer + length] == delimiter[0] ) ) {
+      while ( ( byteBuffer[fieldStart + length] == 32 ) || ( byteBuffer[fieldStart + length] == delimiter[0] ) ) {
         length -= 1;
       }
 
@@ -274,7 +257,10 @@ public class CsvInputData extends BaseStepData implements StepDataInterface {
       length = 0;
     }
 
-    return length;
+    byte[] field = new byte[length];
+    System.arraycopy( byteBuffer, fieldStart, field, 0, length );
+
+    return field;
   }
 
   void closeFile() throws KettleException {
