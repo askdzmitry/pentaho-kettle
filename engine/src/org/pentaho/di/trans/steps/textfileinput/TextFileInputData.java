@@ -55,7 +55,7 @@ public class TextFileInputData extends BaseStepData implements StepDataInterface
 
   public int nrLinesOnPage;
 
-  public FileInputList files;
+  private FileInputList files;
 
   public HashMap<FileObject, Object[]> passThruFields;
 
@@ -160,5 +160,13 @@ public class TextFileInputData extends BaseStepData implements StepDataInterface
     lineStringBuilder = new StringBuilder( 256 );
 
     rejectedFiles = new HashMap<String, Boolean>();
+  }
+
+  public FileInputList getFiles() {
+    return files;
+  }
+
+  public void setFiles( FileInputList files ) {
+    this.files = files;
   }
 }
