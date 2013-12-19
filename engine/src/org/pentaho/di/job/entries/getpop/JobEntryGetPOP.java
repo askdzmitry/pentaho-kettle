@@ -37,6 +37,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.mail.Flags.Flag;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 import org.pentaho.di.cluster.SlaveServer;
@@ -1122,11 +1124,12 @@ public class JobEntryGetPOP extends JobEntryBase implements Cloneable, JobEntryI
     String realFilenamePattern, int nbrmailtoretrieve, SimpleDateFormat df ) throws KettleException {
     try {
       // open folder
-      if ( !usePOP3 && !Const.isEmpty( realIMAPFolder ) ) {
-        mailConn.openFolder(
-          realIMAPFolder,
-          !( getActionType() == MailConnectionMeta.ACTION_TYPE_GET
-          && getAfterGetIMAP() == MailConnectionMeta.AFTER_GET_IMAP_NOTHING ) );
+      if ( !usePOP3 ) {
+        if ( !Const.isEmpty( realIMAPFolder ) ) {
+          mailConn.openFolder( realIMAPFolder, true );
+        } else {
+          mailConn.openFolder( true );
+        }
       } else {
         // If Protocol is POP3 and "Delete after retrieval" is checked, we should open Folder in READ_WRITE Mode!
         mailConn.openFolder( !( getActionType() == MailConnectionMeta.ACTION_TYPE_GET
@@ -1233,6 +1236,8 @@ public class JobEntryGetPOP extends JobEntryBase implements Cloneable, JobEntryI
 
                   // save message content in the file
                   mailConn.saveMessageContentToFile( localfilename_message, realOutputFolder );
+                  // PDI-10942 explicitly set message as read
+                  mailConn.getMessage().setFlag( Flag.SEEN, true );
 
                   if ( isDetailed() ) {
                     logDetailed( BaseMessages.getString( PKG, "JobGetMailsFromPOP.MessageSaved.Label", ""
