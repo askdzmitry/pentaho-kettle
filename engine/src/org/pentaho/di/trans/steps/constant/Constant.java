@@ -26,8 +26,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.sql.Timestamp;
-
 import org.pentaho.di.core.CheckResult;
 import org.pentaho.di.core.CheckResultInterface;
 import org.pentaho.di.core.RowMetaAndData;
@@ -61,20 +59,16 @@ public class Constant extends BaseStep implements StepInterface
 	private ConstantMeta meta;
 	private ConstantData data;
 	
-  public Constant( StepMeta stepMeta, StepDataInterface stepDataInterface,
-    int copyNr, TransMeta transMeta, Trans trans
-  ) {
+	public Constant(StepMeta stepMeta, StepDataInterface stepDataInterface, int copyNr, TransMeta transMeta, Trans trans)
+	{
 		super(stepMeta, stepDataInterface, copyNr, transMeta, trans);
 		
 		meta=(ConstantMeta)getStepMeta().getStepMetaInterface();
 		data=(ConstantData)stepDataInterface;
 	}
 	
-  public static final RowMetaAndData buildRow(
-    ConstantMeta meta,
-    ConstantData data,
-    List<CheckResultInterface> remarks
-  ) {
+    public static final RowMetaAndData buildRow(ConstantMeta meta, ConstantData data, List<CheckResultInterface> remarks)
+    {
         RowMetaInterface rowMeta=new RowMeta();
         Object[] rowData = new Object[meta.getFieldName().length];
 
@@ -221,7 +215,7 @@ public class Constant extends BaseStep implements StepInterface
                 // This is in fact a copy from the fields row, but now with data.
                 rowMeta.addValueMeta(value); 
                 
-      } // end if
+            }// end if
         } // end for
         
         return new RowMetaAndData(rowMeta, rowData);
@@ -232,7 +226,8 @@ public class Constant extends BaseStep implements StepInterface
 		Object[] r=null;
 		r = getRow();
         
-    if ( r == null ) { // no more rows to be expected from the previous step(s)
+        if (r==null) // no more rows to be expected from the previous step(s)
+        {
             setOutputDone();
             return false;
         }

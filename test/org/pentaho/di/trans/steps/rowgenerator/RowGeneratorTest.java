@@ -22,10 +22,11 @@
 
 package org.pentaho.di.trans.steps.rowgenerator;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import java.sql.Timestamp;
 
 import junit.framework.TestCase;
 
@@ -38,6 +39,7 @@ import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMeta;
 import org.pentaho.di.core.row.ValueMetaInterface;
+import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.trans.RowStepCollector;
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransHopMeta;
@@ -46,7 +48,6 @@ import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.steps.dummytrans.DummyTransMeta;
 
-
 /**
  * Test class for the RowGenerator step.
  * 
@@ -54,42 +55,42 @@ import org.pentaho.di.trans.steps.dummytrans.DummyTransMeta;
  *
  * @author Sven Boden
  */
-public class RowGeneratorTest extends TestCase {
-  public RowMetaInterface createRowMetaInterface() {
-    RowMetaInterface rm = new RowMeta();
+public class RowGeneratorTest extends TestCase
+{
+	public RowMetaInterface createRowMetaInterface()
+	{
+		RowMetaInterface rm = new RowMeta();
+		
+		ValueMetaInterface valuesMeta[] = {
+			    new ValueMeta("string",  ValueMeta.TYPE_STRING),
+			    new ValueMeta("boolean", ValueMeta.TYPE_BOOLEAN),
+			    new ValueMeta("integer", ValueMeta.TYPE_INTEGER),
+          new ValueMeta("timestamp", ValueMeta.TYPE_TIMESTAMP)
+	    };
 
-    ValueMetaInterface[] valuesMeta = {
-      new ValueMeta( "string",  ValueMeta.TYPE_STRING ),
-      new ValueMeta( "boolean", ValueMeta.TYPE_BOOLEAN ),
-      new ValueMeta( "integer", ValueMeta.TYPE_INTEGER ),
-      new ValueMeta( "timestamp", ValueMeta.TYPE_TIMESTAMP )
-    };
-
-    for ( int i = 0; i < valuesMeta.length; i++ ) {
-      rm.addValueMeta( valuesMeta[i] );
-    }
-
-    return rm;
-  }
-
-  public List<RowMetaAndData> createData() {
-    List<RowMetaAndData> list = new ArrayList<RowMetaAndData>();
-
-    RowMetaInterface rm = createRowMetaInterface();
-
-    Object[] r1 = new Object[] {
-      "string_value",
-      Boolean.TRUE,
-      new Long( 20L ),
-      Timestamp.valueOf( "1970-01-01 00:00:00.000" )
-    };
-
-    list.add( new RowMetaAndData( rm, r1 ) );
-    list.add( new RowMetaAndData( rm, r1 ) );
-    list.add( new RowMetaAndData( rm, r1 ) );
-
-    return list;
-  }
+		for (int i=0; i < valuesMeta.length; i++ )
+		{
+			rm.addValueMeta(valuesMeta[i]);
+		}
+		
+		return rm;
+	}
+	
+	public List<RowMetaAndData> createData()
+	{
+		List<RowMetaAndData> list = new ArrayList<RowMetaAndData>();	
+		
+		RowMetaInterface rm = createRowMetaInterface();
+		
+		Object[] r1 = new Object[] { "string_value", Boolean.TRUE, 
+				                     new Long(20L), Timestamp.valueOf("1970-01-01 00:00:00.000")};
+		
+		list.add(new RowMetaAndData(rm, r1));
+		list.add(new RowMetaAndData(rm, r1));
+		list.add(new RowMetaAndData(rm, r1));
+		
+		return list;					
+	}
 
   /**
    *  Check the 2 lists comparing the rows in order.
@@ -111,102 +112,108 @@ public class RowGeneratorTest extends TestCase {
       Object[] r2 = rm2.getData();
 
       if ( rm1.size() != rm2.size() ) {
-        fail( "row nr " + idx + " is not equal" );
+        fail( "row size of row at " + idx + " is not equal (" + rm1.size() + "," + rm2.size() + ")" );
       }
-      int[] fields = new int[rm1.size()];
+      int[] fields = new int[1];
       for ( int ydx = 0; ydx < rm1.size(); ydx++ ) {
-        fields[ydx] = ydx;
-      }
-      try {
-        if ( rm1.getRowMeta().compare( r1, r2, fields ) != 0 ) {
-          fail( "row nr " + idx + "is not equal" );
+        fields[0] = ydx;
+        try {
+          if ( rm1.getRowMeta().compare( r1, r2, fields ) != 0 ) {
+            fail( "row nr " + idx + " is not equal at field nr " + ydx + "(" + rm1.toString() + ";" + rm2.toString() + ")");
+          }
+        } catch ( KettleValueException e ) {
+          fail( 
+            "row nr " + idx + " is not equal at field nr " + ydx
+            + "(" + rm1.getRowMeta().getValueMeta(ydx).toString() + ";" + rm2.getRowMeta().getValueMeta(ydx).toString() + ")"
+            + "(" + rm1.getRowMeta().getValueMeta(ydx).getClass().getName() + ";" + rm2.getRowMeta().getValueMeta(ydx).getClass().getName() + ")"
+          );
         }
-      } catch ( KettleValueException e ) {
-        fail( "row nr " + idx + "is not equal" );
       }
 
       idx++;
     }
   }
+	
+   	
+	/**
+	 * Test case for Row Generator step.
+	 */
+    public void testRowGenerator() throws Exception
+    {
+        KettleEnvironment.init();
 
-  /**
-   * Test case for Row Generator step.
-   */
-  public void testRowGenerator() throws Exception {
-    KettleEnvironment.init();
+        //
+        // Create a new transformation...
+        //
+        TransMeta transMeta = new TransMeta();
+        transMeta.setName("row generatortest");
+    	
+        PluginRegistry registry = PluginRegistry.getInstance();            
 
-    //
-    // Create a new transformation...
-    //
-    TransMeta transMeta = new TransMeta();
-    transMeta.setName( "row generatortest" );
+        // 
+        // create a row generator step...
+        //
+        String rowGeneratorStepname = "row generator step";
+        RowGeneratorMeta rm = new RowGeneratorMeta();
+        
+        // Set the information of the row generator.                
+        String rowGeneratorPid = registry.getPluginId(StepPluginType.class, rm);
+        StepMeta rowGeneratorStep = new StepMeta(rowGeneratorPid, rowGeneratorStepname, rm);
+        transMeta.addStep(rowGeneratorStep);
+        
+        //
+        // Do the following specs 3 times.
+        //
+        String fieldName[]   = { "string", "boolean", "integer", "timestamp"};
+        String type[]        = { "String", "Boolean", "Integer", "Timestamp"};
+        String value[]       = { "string_value", "true", "20", "1970-01-01 00:00:00.000"};
+        String fieldFormat[] = { "", "", "", ""};
+        String group[]       = { "", "", "", ""};
+        String decimal[]     = { "", "", "", ""};
+        String currency[]     = { "", "", "", ""};
+        int    intDummies[]  = { -1, -1, -1, -1};
+        boolean    setEmptystring[]  = { false, false, false, false};
+                
+        rm.setDefault();
+        rm.setFieldName(fieldName);
+        rm.setFieldType(type);
+        rm.setValue(value);
+        rm.setFieldLength(intDummies);
+        rm.setFieldPrecision(intDummies);        
+        rm.setRowLimit("3");
+        rm.setFieldFormat(fieldFormat);
+        rm.setGroup(group);
+        rm.setDecimal(decimal);
+        rm.setCurrency(currency);
+        rm.setEmptyString(setEmptystring);
 
-    PluginRegistry registry = PluginRegistry.getInstance();
+        // 
+        // Create a dummy step
+        //
+        String dummyStepname = "dummy step";            
+        DummyTransMeta dm = new DummyTransMeta();
 
-    // 
-    // create a row generator step...
-    //
-    String rowGeneratorStepname = "row generator step";
-    RowGeneratorMeta rm = new RowGeneratorMeta();
+        String dummyPid = registry.getPluginId(StepPluginType.class, dm);
+        StepMeta dummyStep = new StepMeta(dummyPid, dummyStepname, dm);
+        transMeta.addStep(dummyStep);                              
 
-    // Set the information of the row generator.
-    String rowGeneratorPid = registry.getPluginId( StepPluginType.class, rm );
-    StepMeta rowGeneratorStep = new StepMeta( rowGeneratorPid, rowGeneratorStepname, rm );
-    transMeta.addStep( rowGeneratorStep );
+        TransHopMeta hi = new TransHopMeta(rowGeneratorStep, dummyStep);
+        transMeta.addTransHop(hi);
+                
+        // Now execute the transformation...
+        Trans trans = new Trans(transMeta);
 
-    //
-    // Do the following specs 3 times.
-    //
-    String[] fieldName = { "string", "boolean", "integer", "timestamp" };
-    String[] type = { "String", "Boolean", "Integer", "Timestamp" };
-    String[] value = { "string_value", "true", "20", "1970-01-01 00:00:00.000" };
-    String[] fieldFormat = { "", "", "", "" };
-    String[] group = { "", "", "", "" };
-    String[] decimal = { "", "", "", "" };
-    String[] currency = { "", "", "", "" };
-    int[] intDummies = { -1, -1, -1, -1 };
-    boolean[] setEmptystring = { false, false, false, false };
-
-    rm.setDefault();
-    rm.setFieldName( fieldName );
-    rm.setFieldType( type );
-    rm.setValue( value );
-    rm.setFieldLength( intDummies );
-    rm.setFieldPrecision( intDummies );
-    rm.setRowLimit( "3" );
-    rm.setFieldFormat( fieldFormat );
-    rm.setGroup( group );
-    rm.setDecimal( decimal );
-    rm.setCurrency( currency );
-    rm.setEmptyString( setEmptystring );
-
-    // 
-    // Create a dummy step
-    //
-    String dummyStepname = "dummy step";
-    DummyTransMeta dm = new DummyTransMeta();
-
-    String dummyPid = registry.getPluginId( StepPluginType.class, dm );
-    StepMeta dummyStep = new StepMeta( dummyPid, dummyStepname, dm );
-    transMeta.addStep( dummyStep );
-
-    TransHopMeta hi = new TransHopMeta( rowGeneratorStep, dummyStep );
-    transMeta.addTransHop( hi );
-
-    // Now execute the transformation
-    Trans trans = new Trans( transMeta );
-
-    trans.prepareExecution( null );
-
-    StepInterface si = trans.getStepInterface( dummyStepname, 0 );
-    RowStepCollector rc = new RowStepCollector();
-    si.addRowListener( rc );
-
-    trans.startThreads();
-    trans.waitUntilFinished();
-
-    List<RowMetaAndData> checkList = createData();
-    List<RowMetaAndData> resultRows = rc.getRowsWritten();
-    checkRows( resultRows, checkList );
-  }
+        trans.prepareExecution(null);
+                
+        StepInterface si = trans.getStepInterface(dummyStepname, 0);
+        RowStepCollector rc = new RowStepCollector();
+        si.addRowListener(rc);
+        
+        trans.startThreads();        
+        trans.waitUntilFinished();   
+        
+        List<RowMetaAndData> checkList = createData();
+        List<RowMetaAndData> resultRows = rc.getRowsWritten();
+        checkRows(resultRows, checkList);
+    }
 }
