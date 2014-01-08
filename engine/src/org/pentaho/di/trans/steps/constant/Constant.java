@@ -23,6 +23,7 @@
 package org.pentaho.di.trans.steps.constant;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
