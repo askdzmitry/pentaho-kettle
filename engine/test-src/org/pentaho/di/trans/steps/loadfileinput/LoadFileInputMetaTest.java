@@ -1,16 +1,30 @@
 package org.pentaho.di.trans.steps.loadfileinput;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
+
+import java.io.StringReader;
+import java.util.List;
+
+import javax.tools.FileObject;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.junit.After;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.pentaho.di.core.CheckResultInterface;
+import org.pentaho.di.core.fileinput.FileInputList;
+import org.pentaho.di.core.row.RowMetaInterface;
+import org.pentaho.di.core.variables.VariableSpace;
+import org.pentaho.di.repository.Repository;
+import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.metastore.api.IMetaStore;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.StringReader;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * User: Dzmitry Stsiapanau Date: 12/17/13 Time: 3:11 PM
@@ -81,4 +95,32 @@ public class LoadFileInputMetaTest {
     assertEquals( origMeta, testMeta );
   }
 
+  @Test
+  public void testVerifyNoPreviousStep() {
+    LoadFileInputMeta spy = spy( new LoadFileInputMeta() );
+
+    FileInputList fileInputList = mock( FileInputList.class );
+    List<FileObject> files = when( mock( List.class ).size() ).thenReturn( 1 ).getMock();
+    doReturn( files ).when( fileInputList ).getFiles();
+    doReturn( fileInputList ).when( spy ).getFiles( any( VariableSpace.class ) );
+
+    @SuppressWarnings( "unchecked" )
+    List<CheckResultInterface> validationResults = mock( List.class );
+
+    // Check we do not get validation errors
+    doAnswer( new Answer() {
+      @Override
+      public Object answer( InvocationOnMock invocation ) throws Throwable {
+        if ( ( (CheckResultInterface) invocation.getArguments()[0] ).getType() != CheckResultInterface.TYPE_RESULT_OK ) {
+          throw new IllegalArgumentException( "We've got validation error" );
+        }
+
+        return null;
+      }
+    } ).when( validationResults ).add( any( CheckResultInterface.class ) );
+
+    spy.check( validationResults, mock( TransMeta.class ), mock( StepMeta.class ), mock( RowMetaInterface.class ),
+        new String[] {}, new String[] { "File content", "File size" }, mock( RowMetaInterface.class ),
+        mock( VariableSpace.class ), mock( Repository.class ), mock( IMetaStore.class ) );
+  }
 }
