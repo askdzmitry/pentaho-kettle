@@ -37,7 +37,7 @@ import org.productivity.java.syslog4j.Syslog;
 
 /**
  * Write message to SyslogMessage *
- *
+ * 
  * @author Samatar
  * @since 03-Juin-2008
  *
@@ -50,7 +50,7 @@ public class SyslogMessage extends BaseStep implements StepInterface {
   private SyslogMessageData data;
 
   public SyslogMessage( StepMeta stepMeta, StepDataInterface stepDataInterface, int copyNr, TransMeta transMeta,
-    Trans trans ) {
+      Trans trans ) {
     super( stepMeta, stepDataInterface, copyNr, transMeta, trans );
   }
 
@@ -76,7 +76,7 @@ public class SyslogMessage extends BaseStep implements StepInterface {
       if ( data.indexOfMessageFieldName < 0 ) {
         // The field is unreachable !
         throw new KettleException( BaseMessages.getString( PKG, "SyslogMessage.Exception.CouldnotFindField", meta
-          .getMessageFieldName() ) );
+            .getMessageFieldName() ) );
       }
 
     }
@@ -90,8 +90,8 @@ public class SyslogMessage extends BaseStep implements StepInterface {
       }
 
       // Send message
-      SyslogDefs.sendMessage( data.syslog, SyslogDefs.getPriority( meta.getPriority() ), message, meta
-        .isAddTimestamp(), data.datePattern, meta.isAddHostName() );
+      SyslogDefs.sendMessage( data.syslog, SyslogDefs.getPriority( meta.getPriority() ), message,
+          meta.isAddTimestamp(), data.datePattern, meta.isAddHostName() );
 
       putRow( getInputRowMeta(), r ); // copy row to output rowset(s);
 
@@ -178,7 +178,13 @@ public class SyslogMessage extends BaseStep implements StepInterface {
 
     if ( data.syslog != null ) {
       // release resource on syslog
-      data.syslog.shutdown();
+      try {
+        data.syslog.shutdown();
+      } catch ( NullPointerException ignored ) {
+        // Try to close socket (protected field)
+        // without null value checking
+        // thrown in case of unsuccessful connection
+      }
     }
     super.dispose( smi, sdi );
   }
