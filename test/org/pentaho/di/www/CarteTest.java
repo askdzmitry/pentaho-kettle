@@ -62,6 +62,13 @@ public class CarteTest {
 
   @Before
   public void before() {
+
+    CarteSingleton.getInstance().getDetections().clear();
+    CarteSingleton.getInstance().setJobMap( new JobMap() );
+    CarteSingleton.getInstance().setTransformationMap( new TransformationMap() );
+    CarteSingleton.getInstance().getSocketRepository().closeAll();
+    CarteSingleton.getInstance().setSocketRepository( new SocketRepository( new LogChannel( "Carte" ) ) );
+
     tester = new ServletTester();
     tester.addServlet( GetRootServlet.class, "/*" );
     tester.addServlet( GetStatusServlet.class, GetStatusServlet.CONTEXT_PATH );
@@ -81,11 +88,6 @@ public class CarteTest {
   public void after() {
     try {
       tester.stop();
-      CarteSingleton.getInstance().getDetections().clear();
-      CarteSingleton.getInstance().setJobMap( new JobMap() );
-      CarteSingleton.getInstance().setTransformationMap( new TransformationMap() );
-      CarteSingleton.getInstance().getSocketRepository().closeAll();
-      CarteSingleton.getInstance().setSocketRepository( new SocketRepository( new LogChannel( "Carte" ) ) );
       System.out.println( "Stopped" );
     } catch ( Exception ex ) {
       ex.printStackTrace();
@@ -158,6 +160,7 @@ public class CarteTest {
 
   @Test
   public void testAddTransServlet() {
+
     HttpTester request = new HttpTester();
     HttpTester response = new HttpTester();
     request.setMethod( "GET" );
