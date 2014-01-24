@@ -108,17 +108,17 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
   protected RowMetaInterface rowMeta;
 
   /**
-   * @param hostname
-   * @param remoteHostname
-   * @param port
-   * @param sourceStep
-   * @param sourceStepCopyNr
-   * @param targetStep
-   * @param targetStepCopyNr
-   * @param sourceSlaveServerName
-   * @param targetSlaveServerName
-   * @param bufferSize
-   * @param compressingStreams
+   * @param hostname local hostname
+   * @param remoteHostname remote hostname
+   * @param port remote host's port
+   * @param sourceStep source step
+   * @param sourceStepCopyNr source step copy number
+   * @param targetStep target step
+   * @param targetStepCopyNr target step copy number
+   * @param sourceSlaveServerName source slave server name
+   * @param targetSlaveServerName target slave server name
+   * @param bufferSize buffer size to be used
+   * @param compressingStreams whether compression should be used
    * @param rowMeta
    *          The expected row layout to pass through this step. (input or output)
    */
@@ -157,7 +157,7 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
   }
 
   public String getXML() {
-    StringBuffer xml = new StringBuffer();
+    StringBuilder xml = new StringBuilder();
     xml.append( XMLHandler.openTag( XML_TAG ) );
 
     xml.append( XMLHandler.addTagValue( "hostname", hostname, false ) );
@@ -376,7 +376,9 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
           baseStep.stopAll();
         } finally {
           try {
-            socket.shutdownOutput();
+            if ( socket != null ) {
+              socket.shutdownOutput();
+            }
           } catch ( Exception e ) {
             baseStep.logError( "Error shutting down output channel on the server socket of remote step", e );
             baseStep.setErrors( 1L );
@@ -672,8 +674,10 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
             }
           }
           gzipInputStream = null;
-          baseStep.logDetailed( "Closed connection to server socket to read rows from remote step on server "
-            + realHostname + " port " + portNumber + " - Local port=" + socket.getLocalPort() );
+          if ( socket != null ) {
+            baseStep.logDetailed( "Closed connection to server socket to read rows from remote step on server "
+              + realHostname + " port " + portNumber + " - Local port=" + socket.getLocalPort() );
+          }
         }
 
         // signal baseStep that nothing else comes from this step.
@@ -724,14 +728,6 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
   }
 
   /**
-   * @param targetSlaveServerName
-   *          the targetSlaveServerName to set
-   */
-  public void setTargetSlaveServerName( String targetSlaveServerName ) {
-    this.targetSlaveServerName = targetSlaveServerName;
-  }
-
-  /**
    * @return the sourceStepCopyNr
    */
   public int getSourceStepCopyNr() {
@@ -739,26 +735,10 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
   }
 
   /**
-   * @param sourceStepCopyNr
-   *          the sourceStepCopyNr to set
-   */
-  public void setSourceStepCopyNr( int sourceStepCopyNr ) {
-    this.sourceStepCopyNr = sourceStepCopyNr;
-  }
-
-  /**
    * @return the targetStepCopyNr
    */
   public int getTargetStepCopyNr() {
     return targetStepCopyNr;
-  }
-
-  /**
-   * @param targetStepCopyNr
-   *          the targetStepCopyNr to set
-   */
-  public void setTargetStepCopyNr( int targetStepCopyNr ) {
-    this.targetStepCopyNr = targetStepCopyNr;
   }
 
   /**
@@ -774,51 +754,6 @@ public class RemoteStep implements Cloneable, XMLInterface, Comparable<RemoteSte
    */
   public void setBufferSize( int bufferSize ) {
     this.bufferSize = bufferSize;
-  }
-
-  /**
-   * @return the compressingStreams
-   */
-  public boolean isCompressingStreams() {
-    return compressingStreams;
-  }
-
-  /**
-   * @param compressingStreams
-   *          the compressingStreams to set
-   */
-  public void setCompressingStreams( boolean compressingStreams ) {
-    this.compressingStreams = compressingStreams;
-  }
-
-  /**
-   * @return the remoteHostname
-   */
-  public String getRemoteHostname() {
-    return remoteHostname;
-  }
-
-  /**
-   * @param remoteHostname
-   *          the remoteHostname to set
-   */
-  public void setRemoteHostname( String remoteHostname ) {
-    this.remoteHostname = remoteHostname;
-  }
-
-  /**
-   * @return the sourceSlaveServer name
-   */
-  public String getSourceSlaveServerName() {
-    return sourceSlaveServerName;
-  }
-
-  /**
-   * @param sourceSlaveServername
-   *          the sourceSlaveServerName to set
-   */
-  public void setSourceSlaveServerName( String sourceSlaveServerName ) {
-    this.sourceSlaveServerName = sourceSlaveServerName;
   }
 
   @Override
