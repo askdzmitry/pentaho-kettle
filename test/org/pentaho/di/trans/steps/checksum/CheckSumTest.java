@@ -22,6 +22,8 @@
 
 package org.pentaho.di.trans.steps.checksum;
 
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,24 @@ import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.steps.dummytrans.DummyTransMeta;
 
 public class CheckSumTest extends TestCase {
+  private String prevEncoding;
+
+  @Override
+  public void setUp() throws Exception {
+    prevEncoding = System.getProperty( "file.encoding" );
+    System.setProperty( "file.encoding", "UTF-8" );
+    Field charset = Charset.class.getDeclaredField( "defaultCharset" );
+    charset.setAccessible( true );
+    charset.set( null, null );
+  }
+
+  @Override
+  public void tearDown() throws Exception {
+    System.setProperty( "file.encoding", prevEncoding );
+    Field charset = Charset.class.getDeclaredField( "defaultCharset" );
+    charset.setAccessible( true );
+    charset.set( null, null );
+  }
 
   private Trans buildHexadecimalChecksumTrans( int checkSumType, boolean compatibilityMode ) throws Exception {
     KettleEnvironment.init();
@@ -124,7 +144,7 @@ public class CheckSumTest extends TestCase {
 
   /**
    * Create, execute, and return the row listener attached to the output step with complete results from the execution.
-   *
+   * 
    * @param checkSumType
    *          Type of checksum to use (the array index of {@link CheckSumMeta#checksumtypeCodes})
    * @param compatibilityMode
@@ -133,8 +153,7 @@ public class CheckSumTest extends TestCase {
    *          String to calculate checksum for
    * @return RowListener with results.
    */
-  private MockRowListener executeHexTest( int checkSumType, boolean compatibilityMode, String input )
-    throws Exception {
+  private MockRowListener executeHexTest( int checkSumType, boolean compatibilityMode, String input ) throws Exception {
     Trans trans = buildHexadecimalChecksumTrans( checkSumType, compatibilityMode );
 
     trans.prepareExecution( null );
