@@ -1428,7 +1428,7 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
 
   /**
    * Make attempt to fire all registered listeners if possible.
-   * 
+   *
    * @throws KettleException
    *           if any errors occur during notification
    */
@@ -3766,13 +3766,15 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
           }
         }
       }
+    } catch ( KettleException ke ) {
+      throw ke;
     } catch ( Exception e ) {
       throw new KettleException( "There was an error during transformation split", e );
     }
   }
 
   /**
-   * Monitors a clustered transformation every second, 
+   * Monitors a clustered transformation every second,
    * after all the transformations in a cluster schema are running.<br>
    * Now we should verify that they are all running as they should.<br>
    * If a transformation has an error, we should kill them all.<br>
@@ -3796,7 +3798,7 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
   }
 
   /**
-   * Monitors a clustered transformation every second, 
+   * Monitors a clustered transformation every second,
    * after all the transformations in a cluster schema are running.<br>
    * Now we should verify that they are all running as they should.<br>
    * If a transformation has an error, we should kill them all.<br>
@@ -4250,10 +4252,11 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
       }
 
       return carteObjectId;
+    } catch ( KettleException ke ) {
+      throw ke;
     } catch ( Exception e ) {
       throw new KettleException( e );
     }
-
   }
 
   /**
@@ -4559,7 +4562,7 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
   }
 
   /**
-   * Gets a list of the transformation listeners. 
+   * Gets a list of the transformation listeners.
    * Please do not attempt to modify this list externally.
    * Returned list is mutable only for backward compatibility purposes.
    *
