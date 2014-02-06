@@ -2,7 +2,7 @@
  *
  * Pentaho Data Integration
  *
- * Copyright (C) 2002-2013 by Pentaho : http://www.pentaho.com
+ * Copyright (C) 2002-2014 by Pentaho : http://www.pentaho.com
  *
  *******************************************************************************
  *
@@ -22,34 +22,15 @@
 
 package org.pentaho.di.trans.steps.userdefinedjavaclass;
 
-import org.pentaho.di.trans.step.StepMeta;
+import org.junit.Test;
 
-public class StepDefinition implements Cloneable {
-  public String tag;
-  public String stepName;
-  public StepMeta stepMeta;
-  public String description;
-
-  public StepDefinition() {
-    this.tag = "";
-    this.stepName = "";
-    this.stepMeta = null;
-    this.description = "";
-  }
-
-  public StepDefinition( String tag, String stepName, StepMeta stepMeta, String description ) {
-    this.tag = tag;
-    this.stepName = stepName;
-    this.stepMeta = stepMeta;
-    this.description = description;
-  }
-
-  public Object clone() throws CloneNotSupportedException {
-    StepDefinition retval;
-    retval = (StepDefinition) super.clone();
-    if ( stepMeta != null ) {
-      retval.stepMeta = (StepMeta) stepMeta.clone();
-    }
-    return retval;
+/**
+ * User: Dzmitry Stsiapanau Date: 2/6/14 Time: 2:29 PM
+ */
+public class StepDefinitionTest {
+  @Test
+  public void testClone() throws Exception {
+    StepDefinition stepDefinition = new StepDefinition( "tag", "stepName", null, "" );
+    Object cloneDefinition = stepDefinition.clone();
   }
 }
