@@ -50,7 +50,7 @@ public class JobEntryCopyTest {
   public void testReplaceMetaCloneEntryOfOrigin() throws Exception {
 
     copyJobEntry.replaceMeta( originJobEntry );
-    assertNotSame( "Entry of origin and copy JobEntry should be different objects: ", copyJobEntry.getEntry(),
+    assertNotSame( "Entry of origin and copy JobEntryItem should be different objects: ", copyJobEntry.getEntry(),
         originJobEntry.getEntry() );
   }
 
@@ -58,7 +58,7 @@ public class JobEntryCopyTest {
   public void testReplaceMetaDoesNotChangeEntryOfOrigin() throws Exception {
 
     copyJobEntry.replaceMeta( originJobEntry );
-    assertEquals( "hasChanged in Entry of origin JobEntry should not be changed. ", false, originJobEntry.getEntry()
+    assertEquals( "hasChanged in Entry of origin JobEntryItem should not be changed. ", false, originJobEntry.getEntry()
         .hasChanged() );
   }
 
@@ -66,7 +66,7 @@ public class JobEntryCopyTest {
   public void testReplaceMetaChangesEntryOfCopy() throws Exception {
 
     copyJobEntry.replaceMeta( originJobEntry );
-    assertEquals( "hasChanged in Entry of copy JobEntry should be changed. ", true, copyJobEntry.getEntry()
+    assertEquals( "hasChanged in Entry of copy JobEntryItem should be changed. ", true, copyJobEntry.getEntry()
         .hasChanged() );
   }
 

@@ -62,9 +62,9 @@ public class ExcelOutputTemplateTest {
         new ExcelOutput( helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
     ExcelOutputMeta meta = createStepMeta();
     excelOutput.init( meta, helper.initStepDataInterface );
-    Assert.assertEquals( "Step init error.", 0, excelOutput.getErrors() );
+    Assert.assertEquals( "StepItem init error.", 0, excelOutput.getErrors() );
     excelOutput.dispose( meta, helper.initStepDataInterface );
-    Assert.assertEquals( "Step dispose error", 0, excelOutput.getErrors() );
+    Assert.assertEquals( "StepItem dispose error", 0, excelOutput.getErrors() );
   }
 
   private ExcelOutputMeta createStepMeta() throws IOException {

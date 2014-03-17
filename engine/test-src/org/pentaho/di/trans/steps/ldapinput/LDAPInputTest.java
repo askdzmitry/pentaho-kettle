@@ -14,7 +14,7 @@ import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 /**
- * Tests LDAP Input Step
+ * Tests LDAP Input StepItem
  *
  * @author nhudak
  */

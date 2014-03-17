@@ -142,7 +142,7 @@ public class PDI5436Test {
     StepMetaInterface meta = mockStepMeta();
     StepDataInterface data = smh.initStepDataInterface;
 
-    Assert.assertTrue( "Step init failed", stepSpy.init( meta, data ) );
+    Assert.assertTrue( "StepItem init failed", stepSpy.init( meta, data ) );
     Assert.assertTrue( "Error processing row", stepSpy.processRow( meta, data ) );
     Assert.assertEquals( "Cache lookup failed", "value", outputRowSet.getRow()[2] );
   }

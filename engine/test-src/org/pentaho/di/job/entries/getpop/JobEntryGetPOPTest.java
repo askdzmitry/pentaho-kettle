@@ -44,7 +44,7 @@ public class JobEntryGetPOPTest {
   }
 
   /**
-   * PDI-10942 - Job get emails JobEntry does not mark emails as 'read' when load emails content.
+   * PDI-10942 - Job get emails JobEntryItem does not mark emails as 'read' when load emails content.
    * 
    * Test that we always open remote folder in rw mode, and after email attachment is loaded email is marked as read.
    * Set for openFolder rw mode if this is pop3.
@@ -61,7 +61,7 @@ public class JobEntryGetPOPTest {
   }
 
   /**
-   * PDI-10942 - Job get emails JobEntry does not mark emails as 'read' when load emails content.
+   * PDI-10942 - Job get emails JobEntryItem does not mark emails as 'read' when load emails content.
    * 
    * Test that we always open remote folder in rw mode, and after email attachment is loaded email is marked as read.
    * protocol IMAP and default remote folder is overridden
@@ -78,7 +78,7 @@ public class JobEntryGetPOPTest {
   }
 
   /**
-   * PDI-10942 - Job get emails JobEntry does not mark emails as 'read' when load emails content.
+   * PDI-10942 - Job get emails JobEntryItem does not mark emails as 'read' when load emails content.
    * 
    * Test that we always open remote folder in rw mode, and after email attachment is loaded email is marked as read.
    * protocol IMAP and default remote folder is NOT overridden
