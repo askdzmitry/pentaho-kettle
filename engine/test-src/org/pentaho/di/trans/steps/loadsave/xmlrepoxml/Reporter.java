@@ -144,7 +144,17 @@ public class Reporter {
 
   }
 
+    private void appendHeader(StringBuilder sb) {
+        sb.append("<html><head></head><body>");
+    }
 
+    private void appendBody(StringBuilder sb) {
+        sb.append();
+    }
+
+    private void appendOneResultHtml(StringBuilder sb, Result res) {
+        sb.append("<tr><td>").append()
+    }
 
 
 //  public class FileFirstComparator implements Comparator<XmlRepoRoundTripTester.Result> {

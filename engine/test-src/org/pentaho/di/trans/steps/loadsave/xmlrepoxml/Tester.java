@@ -153,19 +153,31 @@ public class Tester {
 
 
   public static void main(String[] args) {
-    Tester tester = new Tester("d:\\Work\\Pentaho\\Repos\\F\\pentaho-kettle\\assembly\\package-res\\samples\\");
-    Reporter reporter = new Reporter("D:\\temp\\");
+
+    if (args.length < 3) {
+        System.err.println("Not enough arguments");
+    }
+
+    String workingDir = args[1];
+    String reportDir = args[2];
+
+    Tester tester = new Tester(workingDir);
+    Reporter reporter = new Reporter(reportDir);
+
+    // test xml -> repo -> xml roundtrip
     List<Result> results = tester.testXmlRepoXmlTrip();
 
-    int ok = 0;
-    for (int i = 0; i < results.size(); i++) {
-      if ( results.get( i ).isOk() ) {
-        ok++;
-      }
-    }
-    System.out.println("OK - " + ok);
-    System.out.println("FAIL - " + (results.size() - ok));
+      // TODO remove test code
+//    int ok = 0;
+//    for (int i = 0; i < results.size(); i++) {
+//      if ( results.get( i ).isOk() ) {
+//        ok++;
+//      }
+//    }
+//    System.out.println("OK - " + ok);
+//    System.out.println("FAIL - " + (results.size() - ok));
 
+    // generate html report
     try {
       reporter.generate( results );
     } catch ( Exception e ) {
@@ -180,15 +192,17 @@ public class Tester {
     sb.append( "<table border = \"1\">" );
     for (Map.Entry<String, Throwable> entry : fileLoadErrors.entrySet()) {
       sb.append( "<tr><td>" ).append( entry.getKey() ).append( "</td><td>" )
-        .append( entry.getValue().toString() ).append(  )
+        .append( entry.getValue().toString() ).append( "<>" )
     }
-
-
   }
 
   private void appendStackTraceHtml(StringBuilder sb, Throwable t) {
 
-    t.getStackTrace();
+    StackTraceElement[] stack = t.getStackTrace();
+
+    for (int i = 0; i < stack.length; i++) {
+
+    }
 
     StringWriter stringWriter = new StringWriter( );
     t.printStackTrace( stringWriter );
