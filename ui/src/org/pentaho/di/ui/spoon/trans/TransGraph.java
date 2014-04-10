@@ -3764,7 +3764,8 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
         // Do we capture data?
         //
         if ( transPreviewDelegate.isActive() ) {
-          transPreviewDelegate.capturePreviewData( trans, transMeta.getSteps() );
+          transPreviewDelegate.capturePreviewDataRecursively( trans );
+//          transPreviewDelegate.capturePreviewData( trans, transMeta.getSteps() );
         }
 
         // Start the threads for the steps...
@@ -3971,7 +3972,8 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
           // Do we capture data?
           //
           if ( transPreviewDelegate.isActive() ) {
-            transPreviewDelegate.capturePreviewData( trans, transMeta.getSteps() );
+//            transPreviewDelegate.capturePreviewData( trans, transMeta.getSteps() );
+            transPreviewDelegate.capturePreviewDataRecursively( trans );
           }
 
           initialized = true;
@@ -4237,7 +4239,7 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
    * Finds the last active transformation in the running job to the opened transMeta
    *
    * @param transGraph
-   * @param jobEntryCopy
+   * @param stepMeta
    */
   private void attachActiveTrans( TransGraph transGraph, StepMeta stepMeta ) {
     if ( trans != null && transGraph != null ) {
@@ -4254,7 +4256,7 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
    * Finds the last active transformation in the running job to the opened transMeta
    *
    * @param transGraph
-   * @param jobEntryCopy
+   * @param stepMeta
    */
   private Trans getActiveSubtransformation( TransGraph transGraph, StepMeta stepMeta ) {
     if ( trans != null && transGraph != null ) {
@@ -4616,7 +4618,6 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
    *
    * @param step1
    * @param step2
-   * @param speeds
    * @param locations
    * @return
    */
@@ -4636,8 +4637,8 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
   /**
    * The longer the hop, the higher the force
    *
-   * @param stepMeta
    * @param hopMeta
+   * @param locations
    * @return
    */
   private Force getHookeAttraction( TransHopMeta hopMeta, Map<StepMeta, StepLocation> locations ) {

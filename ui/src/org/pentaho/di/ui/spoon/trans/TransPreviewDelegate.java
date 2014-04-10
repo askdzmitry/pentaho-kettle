@@ -22,13 +22,6 @@
 
 package org.pentaho.di.ui.spoon.trans;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -54,9 +47,11 @@ import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransAdapter;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.RowAdapter;
+import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.step.StepInterface;
 import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.trans.step.StepMetaDataCombi;
+import org.pentaho.di.trans.steps.metainject.MetaInjectData;
 import org.pentaho.di.ui.core.PropsUI;
 import org.pentaho.di.ui.core.dialog.ErrorDialog;
 import org.pentaho.di.ui.core.gui.GUIResource;
@@ -71,6 +66,16 @@ import org.pentaho.ui.xul.XulLoader;
 import org.pentaho.ui.xul.containers.XulToolbar;
 import org.pentaho.ui.xul.impl.XulEventHandler;
 import org.pentaho.ui.xul.swt.tags.SwtRadio;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandler {
   private static Class<?> PKG = Spoon.class; // for i18n purposes, needed by Translator2!!
@@ -92,6 +97,8 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
   private Text logText;
   private TableView tableView;
 
+  private boolean initialized;
+
   public enum PreviewMode {
     FIRST, LAST, OFF,
   }
@@ -112,9 +119,10 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
     super( spoon );
     this.transGraph = transGraph;
 
-    previewMetaMap = new HashMap<StepMeta, RowMetaInterface>();
-    previewDataMap = new HashMap<StepMeta, List<Object[]>>();
-    previewLogMap = new HashMap<StepMeta, StringBuffer>();
+    TransMeta transMeta = transGraph.getTransMeta();
+    previewMetaMap = PreviewDataCache.INSTANCE.getPreviewMetaMap( transMeta );
+    previewDataMap = PreviewDataCache.INSTANCE.getPreviewDataMap( transMeta );
+    previewLogMap = PreviewDataCache.INSTANCE.getPreviewLogMap( transMeta );
 
     previewMode = PreviewMode.FIRST;
   }
@@ -234,6 +242,16 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
       return;
     }
 
+    // fix
+//    if (transGraph != null && transGraph.getTrans() != null && transGraph.getTrans().getTransMeta() != null) {
+//      if (!initialized) {
+//        capturePreviewData( transGraph.getTrans(), transGraph.getTrans().getTransMeta().getSteps() );
+//        initialized = true;
+//      }
+//    }
+
+//    capturePreviewData( transGraph.getTrans(), Arrays.asList( selectedStep ) );
+
     // Which step do we preview...
     //
     StepMeta stepMeta = selectedStep; // copy to prevent race conditions and so on.
@@ -267,7 +285,7 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
       List<Object[]> rowData = previewDataMap.get( stepMeta );
 
       try {
-        showPreviewGrid( transGraph.getManagedObject(), stepMeta, rowMeta, rowData );
+        showPreviewGrid( transGraph.getManagedObject(), stepMeta, rowMeta.clone(), rowData );
       } catch ( Exception e ) {
         e.printStackTrace();
         logText.append( Const.getStackTracker( e ) );
@@ -423,14 +441,67 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
     this.previewMode = previewMode;
   }
 
+  private List<Trans> findAllAffectedTransForPreviewData( final Trans trans, List<StepMeta> stepMetas,
+                                                          Set<TransGraph> transGraphs ) {
+    List<Trans> result = new ArrayList<Trans>(  );
+    result.add( trans );
+
+    for (StepMetaDataCombi stepCombi : trans.getSteps()) {
+//    for (StepMeta stepMeta : stepMetas) {
+
+      // process ETL Metadata Injection step
+      StepDataInterface data = trans.getStepDataInterface( stepCombi.stepMeta.getName(), stepCombi.copy );
+      if (data instanceof MetaInjectData) {
+        MetaInjectData metaInjectData = (MetaInjectData)data;
+        TransMeta childTransMeta = metaInjectData.transMeta;
+        TransGraph childTransGraph = getTranByTransMeta( childTransMeta, transGraphs );
+        if (childTransGraph != null ) {
+          // remove to avoid invinite loops if transformation A -> B -> C -> A
+          transGraphs.remove( childTransGraph );
+          Trans childTrans = childTransGraph.getTrans();
+          // do recursively for child trans
+          result.addAll( findAllAffectedTransForPreviewData( childTrans, childTransMeta.getSteps(), transGraphs ) );
+        }
+      }
+    }
+    return result;
+  }
+
+  public TransGraph getTranByTransMeta(TransMeta transMeta, Collection<TransGraph> transGraphList) {
+    for (TransGraph transGraph : transGraphList) {
+      if (transGraph.getTransMeta().equals( transMeta )) {
+        return transGraph;
+      }
+    }
+    return null;
+  }
+
+  public void capturePreviewDataRecursively(Trans trans) {
+
+    // get all trans graphs
+    Set<TransGraph> transGraphs = new HashSet(spoon.delegates.tabs.getTransGraphs());
+    List<Trans> transList = findAllAffectedTransForPreviewData(trans, trans.getTransMeta().getSteps(), transGraphs );
+
+    // capture preview data for all transformations
+    for (Trans transItem : transList) {
+      capturePreviewData( trans, trans.getTransMeta().getSteps() );
+    }
+  }
+
   public void capturePreviewData( final Trans trans, List<StepMeta> stepMetas ) {
     final StringBuffer loggingText = new StringBuffer();
 
+    PreviewDataCache cache = PreviewDataCache.INSTANCE;
+
     // First clean out previous preview data. Otherwise this method leaks memory like crazy.
     //
-    previewLogMap.clear();
-    previewMetaMap.clear();
-    previewDataMap.clear();
+//    previewLogMap.clear();
+//    previewMetaMap.clear();
+//    previewDataMap.clear();
+    cache.clear( trans.getTransMeta() );
+//    final Map<StepMeta, RowMetaInterface> previewMetaMap = new HashMap<StepMeta, RowMetaInterface>(  );
+//    final Map<StepMeta, List<Object[]>> previewDataMap = new HashMap<StepMeta, List<Object[]>>(  );
+//    final Map<StepMeta, StringBuffer> previewLogMap = new HashMap<StepMeta, StringBuffer>(  );
 
     try {
       final TransMeta transMeta = trans.getTransMeta();
@@ -491,6 +562,9 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
     } catch ( Exception e ) {
       loggingText.append( Const.getStackTracker( e ) );
     }
+//    finally {
+//      PreviewDataCache.INSTANCE.put( trans.getTransMeta(), previewMetaMap,previewDataMap,previewLogMap );
+//    }
 
     // In case there were errors during preview...
     //
@@ -516,6 +590,7 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
 
   public void addPreviewData( StepMeta stepMeta, RowMetaInterface rowMeta, List<Object[]> rowsData,
     StringBuffer buffer ) {
+
     previewLogMap.put( stepMeta, buffer );
     previewMetaMap.put( stepMeta, rowMeta );
     previewDataMap.put( stepMeta, rowsData );
@@ -560,4 +635,72 @@ public class TransPreviewDelegate extends SpoonDelegate implements XulEventHandl
     lastRadio.setSelected( false );
     offRadio.setSelected( true );
   }
+
+  private List<TransMeta> getOpenTransMetas() {
+    List<TransGraph> graphs = spoon.delegates.tabs.getTransGraphs();
+    List<TransMeta> results = new ArrayList<TransMeta>(  );
+    for (TransGraph graph : graphs) {
+      results.add( graph.getTransMeta() );
+    }
+    return results;
+  }
+
+  public static enum PreviewDataCache {
+
+    INSTANCE;
+
+    public Map<TransMeta, Map<StepMeta, RowMetaInterface>> previewMetaCache = new HashMap<TransMeta, Map<StepMeta, RowMetaInterface>>(  );
+    public Map<TransMeta, Map<StepMeta, List<Object[]>>> previewDataCache = new HashMap<TransMeta, Map<StepMeta, List<Object[]>>>(  );
+    public Map<TransMeta, Map<StepMeta, StringBuffer>> previewLogCache = new HashMap<TransMeta, Map<StepMeta, StringBuffer>>(  );
+
+    public void clear(TransMeta transMeta) {
+      Map res = previewMetaCache.get( transMeta );
+      if (res != null) {
+        res.clear();
+      }
+      res = previewDataCache.get( transMeta );
+      if (res != null) {
+        res.clear();
+      }
+      res = previewLogCache.get( transMeta );
+      if (res != null) {
+        res.clear();
+      }
+    }
+
+    public void put(TransMeta transMeta, Map<StepMeta, RowMetaInterface> previewMeta, Map<StepMeta, List<Object[]>> previewData,
+                    Map<StepMeta, StringBuffer> previewLog) {
+      previewMetaCache.put( transMeta, previewMeta );
+      previewDataCache.put( transMeta, previewData );
+      previewLogCache.put( transMeta, previewLog );
+    }
+
+    public Map<StepMeta, RowMetaInterface> getPreviewMetaMap(TransMeta transMeta) {
+      Map<StepMeta, RowMetaInterface> res = previewMetaCache.get( transMeta );
+      if (res == null) {
+        res = new HashMap<StepMeta, RowMetaInterface>(  );
+        previewMetaCache.put( transMeta, res );
+      }
+      return res;
+    }
+
+    public Map<StepMeta, List<Object[]>> getPreviewDataMap(TransMeta transMeta) {
+      Map<StepMeta, List<Object[]>> res = previewDataCache.get( transMeta );
+      if (res == null) {
+        res = new HashMap<StepMeta, List<Object[]>>(  );
+        previewDataCache.put( transMeta, res );
+      }
+      return res;
+    }
+
+    public Map<StepMeta, StringBuffer> getPreviewLogMap(TransMeta transMeta) {
+      Map<StepMeta, StringBuffer> res =  previewLogCache.get(transMeta);
+      if (res == null) {
+        res = new HashMap<StepMeta, StringBuffer>(  );
+        previewLogCache.put(transMeta, res);
+      }
+      return res;
+    }
+  }
+
 }

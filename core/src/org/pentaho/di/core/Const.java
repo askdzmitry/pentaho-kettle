@@ -42,6 +42,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -1080,7 +1081,7 @@ public class Const {
   /**
    * Left trim: remove spaces to the left of a String.
    *
-   * @param str
+   * @param source
    *          The String to left trim
    * @return The left trimmed String
    */
@@ -1099,7 +1100,7 @@ public class Const {
   /**
    * Right trim: remove spaces to the right of a string
    *
-   * @param str
+   * @param source
    *          The string to right trim
    * @return The trimmed string.
    */
@@ -2248,7 +2249,7 @@ public class Const {
    * Check if the string array supplied is empty. A String array is empty when it is null or when the number of elements
    * is 0
    *
-   * @param string
+   * @param strings
    *          The string array to check
    * @return true if the string array supplied is empty
    */
@@ -2268,7 +2269,7 @@ public class Const {
   }
 
   /**
-   * Check if the list supplied is empty. An array is empty when it is null or when the length is 0
+   * Check if the list supplied is empty. An list is empty when it is null or when the size is 0
    *
    * @param list
    *          the list to check
@@ -2276,6 +2277,17 @@ public class Const {
    */
   public static final boolean isEmpty( List<?> list ) {
     return list == null || list.size() == 0;
+  }
+
+  /**
+   * Check if the map supplied is empty. An map is empty when it is null or when the size is 0
+   *
+   * @param map
+   *          the list to check
+   * @return true if the supplied list is empty
+   */
+  public static final boolean isEmpty( Map map ) {
+    return map == null || map.size() == 0;
   }
 
   /**

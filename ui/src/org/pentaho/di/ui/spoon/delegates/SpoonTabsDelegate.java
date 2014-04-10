@@ -22,9 +22,6 @@
 
 package org.pentaho.di.ui.spoon.delegates;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.vfs.FileObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.LocationListener;
@@ -55,6 +52,9 @@ import org.pentaho.ui.util.Launch;
 import org.pentaho.ui.util.Launch.Status;
 import org.pentaho.xul.swt.tab.TabItem;
 import org.pentaho.xul.swt.tab.TabSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpoonTabsDelegate extends SpoonDelegate {
   private static Class<?> PKG = Spoon.class; // for i18n purposes, needed by Translator2!!
@@ -149,6 +149,21 @@ public class SpoonTabsDelegate extends SpoonDelegate {
       }
     }
     return null;
+  }
+
+  public List<TransGraph> getTransGraphs() {
+    List<TabMapEntry> tabs = getTabs();
+    List<TransGraph> results = new ArrayList<TransGraph>();
+
+    if (tabs == null || tabs.size() == 0) {
+      return null;
+    }
+    for (TabMapEntry tab : tabs) {
+      if (tab.getObject() instanceof TransGraph) {
+        results.add( (TransGraph)tab.getObject() );
+      }
+    }
+    return results;
   }
 
   public EngineMetaInterface getActiveMeta() {
