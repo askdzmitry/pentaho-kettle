@@ -22,15 +22,11 @@
 
 package org.pentaho.di.ui.spoon.dialog;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ExpandEvent;
 import org.eclipse.swt.events.ExpandListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -48,10 +44,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -67,6 +65,11 @@ import org.pentaho.di.ui.core.gui.GUIResource;
 import org.pentaho.di.ui.core.gui.WindowProperty;
 import org.pentaho.di.ui.spoon.Spoon;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MarketplaceDialog extends Dialog {
   private static Class<?> MARKET_PKG = Market.class; // for i18n purposes, needed by Translator2!!
@@ -248,7 +251,8 @@ public class MarketplaceDialog extends Dialog {
                     }
                   }
                   if ( upgradeButton != null ) {
-                    if ( marketEntry.isInstalled() && marketEntry.getInstalledVersion().compareTo( marketEntry.getVersion() ) < 0 ) {
+                    if ( marketEntry.isInstalled()
+                      && marketEntry.getInstalledVersion().compareTo( marketEntry.getVersion() ) < 0 ) {
                       upgradeButton.setVisible( true );
                     } else {
                       upgradeButton.setVisible( false );
@@ -367,7 +371,7 @@ public class MarketplaceDialog extends Dialog {
     expandItem.setHeight( 30 );
     //expandItem.setControl(composite);
     Image image;
-    switch ( marketEntry.getType() ) {
+    switch( marketEntry.getType() ) {
       case Step:
         image = GUIResource.getInstance().getImageTransGraph();
         break;
@@ -392,13 +396,29 @@ public class MarketplaceDialog extends Dialog {
   }
 
   private Composite createMarketEntryControl( final MarketEntry marketEntry ) {
-    final Composite composite = new Composite( expandBar, SWT.NONE );
+    final ScrolledComposite scrollBox = new ScrolledComposite( expandBar, SWT.V_SCROLL );
+    scrollBox.setExpandHorizontal( true );
+    scrollBox.setExpandVertical( true );
+    final Composite composite = new Composite( scrollBox, SWT.NONE );
     composite.setData( "marketEntry", marketEntry );
     FormLayout layout = new FormLayout();
     layout.marginHeight = margin;
     layout.marginWidth = margin;
     composite.setLayout( layout );
     props.setLook( composite );
+
+    composite.addListener( SWT.Paint, new Listener() {
+      int width = -1;
+
+      public void handleEvent( Event e ) {
+        int newWidth = composite.getSize().x;
+        if ( newWidth != width ) {
+          scrollBox.setMinHeight( composite.computeSize( newWidth, SWT.DEFAULT ).y + 15 );
+          width = newWidth;
+        }
+      }
+    } );
+    scrollBox.setContent( composite );
 
     // Add a series of details in the expand-bar item as well as an install
     // button...
@@ -410,19 +430,38 @@ public class MarketplaceDialog extends Dialog {
     addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.Name.label" ), lastControl );
     lastControl = addRightLabel( composite, Const.NVL( marketEntry.getName(), "" ), lastControl );
     // The version
-    addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.AvailableVersion.label" ), lastControl );
+    addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.AvailableVersion.label" ),
+      lastControl );
     lastControl = addRightLabel( composite, Const.NVL( marketEntry.getVersion(), "" ), lastControl );
+    // The minimum PDI version
+    if ( !Const.isEmpty( marketEntry.getMinPdiVersion() ) ) {
+      System.out.println( Const.NVL( marketEntry.getName(), "" ) + "No " + marketEntry.getMinPdiVersion() );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.MinPdiVersion.label" ),
+        lastControl );
+      lastControl = addRightLabel( composite, Const.NVL( marketEntry.getMinPdiVersion(), "" ), lastControl );
+    }
+    // The maximum PDI version
+    if ( !Const.isEmpty( marketEntry.getMaxPdiVersion() ) ) {
+      System.out.println( Const.NVL( marketEntry.getName(), "" ) + "No " + marketEntry.getMaxPdiVersion() );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.MaxPdiVersion.label" ),
+        lastControl );
+      lastControl = addRightLabel( composite, Const.NVL( marketEntry.getMaxPdiVersion(), "" ), lastControl );
+    }
+
     // The author
     if ( !Const.isEmpty( marketEntry.getAuthor() ) ) {
       addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.Author.label" ), lastControl );
       lastControl = addRightLabel( composite, Const.NVL( marketEntry.getAuthor(), "" ), lastControl );
     }
     // Installation path
-    addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.InstallPath.label" ), lastControl );
-    lastControl = addRightLabel( composite, new File( Market.buildPluginsFolderPath( marketEntry ) ).getAbsolutePath(), lastControl );
+    addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.InstallPath.label" ),
+      lastControl );
+    lastControl = addRightLabel( composite, new File( Market.buildPluginsFolderPath( marketEntry ) ).getAbsolutePath(),
+      lastControl );
     // The description
     if ( !Const.isEmpty( marketEntry.getDescription() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.Description.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.Description.label" ),
+        lastControl );
       lastControl = addRightLabel( composite, marketEntry.getDescription(), lastControl );
     }
     // The package URL
@@ -430,17 +469,20 @@ public class MarketplaceDialog extends Dialog {
     lastControl = addRightURL( composite, marketEntry.getPackageUrl(), lastControl );
     // The documentation URL
     if ( !Const.isEmpty( marketEntry.getDocumentationUrl() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.Documentation.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.Documentation.label" ),
+        lastControl );
       lastControl = addRightURL( composite, marketEntry.getDocumentationUrl(), lastControl );
     }
     // The case tracking URL
     if ( !Const.isEmpty( marketEntry.getCasesUrl() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.CaseTracking.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.CaseTracking.label" ),
+        lastControl );
       lastControl = addRightURL( composite, marketEntry.getCasesUrl(), lastControl );
     }
     // The source code URL
     if ( !Const.isEmpty( marketEntry.getSourceUrl() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SourceCode.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SourceCode.label" ),
+        lastControl );
       lastControl = addRightURL( composite, marketEntry.getSourceUrl(), lastControl );
     }
     // The license name
@@ -450,29 +492,42 @@ public class MarketplaceDialog extends Dialog {
     }
     // The license text
     if ( !Const.isEmpty( marketEntry.getLicenseText() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.LicenseDetails.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.LicenseDetails.label" ),
+        lastControl );
       lastControl = addRightLabel( composite, Const.NVL( marketEntry.getLicenseText(), "" ), lastControl );
     }
     // The support level
-    addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SupportLevel.label" ), lastControl );
+    addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SupportLevel.label" ),
+      lastControl );
     lastControl = addRightLabel( composite, marketEntry.getSupportLevel().getDescription(), lastControl );
     // The support message
     if ( !Const.isEmpty( marketEntry.getSupportMessage() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SupportMessage.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SupportMessage.label" ),
+        lastControl );
       lastControl = addRightLabel( composite, marketEntry.getSupportMessage(), lastControl );
     }
     // The support URL
     if ( !Const.isEmpty( marketEntry.getSupportUrl() ) ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SupportURL.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.SupportURL.label" ),
+        lastControl );
       lastControl = addRightURL( composite, marketEntry.getSupportUrl(), lastControl );
     }
+    // The installation notes
+    if ( !Const.isEmpty( marketEntry.getInstallationNotes() ) ) {
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.InstallationNotes.label" ),
+        lastControl );
+      lastControl = addRightLabel( composite, marketEntry.getInstallationNotes(), lastControl );
+    }
+
 
     Market.discoverInstalledVersion( marketEntry );
 
     if ( marketEntry.isInstalled() ) {
-      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.InstalledVersion.label" ), lastControl );
+      addLeftLabel( composite, BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.InstalledVersion.label" ),
+        lastControl );
       lastControl = addRightLabel( composite, marketEntry.getInstalledVersion(), lastControl );
     }
+
 
     final Button installedButton = new Button( composite, SWT.PUSH );
     installedButton.setData( "id", "installedButton" );
@@ -482,7 +537,8 @@ public class MarketplaceDialog extends Dialog {
     // Allow for upgrade
     final Button upgradeButton = new Button( composite, SWT.PUSH );
     upgradeButton.setData( "id", "upgradeButton" );
-    upgradeButton.setText( BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.UpgradeTo.button", marketEntry.getVersion() ) );
+    upgradeButton
+      .setText( BaseMessages.getString( MARKET_PKG, "MarketplacesDialog.UpgradeTo.button", marketEntry.getVersion() ) );
     upgradeButton.addSelectionListener( upgradeSelectionListener );
     //TODO: extract listener and instantiate that only once.
     /*
@@ -527,9 +583,10 @@ public class MarketplaceDialog extends Dialog {
         }
       }
     });
-    */
+  */
 
-    BaseStepDialog.positionBottomButtons( composite, new Button[] { installedButton, upgradeButton }, margin, lastControl );
+    BaseStepDialog
+      .positionBottomButtons( composite, new Button[] { installedButton, upgradeButton }, margin, lastControl );
     boolean showUpgradeButton = marketEntry.isInstalled()
       && ( marketEntry.getInstalledVersion() == null
         || marketEntry.getVersion() == null
@@ -537,63 +594,63 @@ public class MarketplaceDialog extends Dialog {
       );
     upgradeButton.setVisible( showUpgradeButton );
 
-    /*
-        // Create runner for installation/uninstallation
-        final ProgressMonitorRunner installRunner = new ProgressMonitorRunner(new Runnable() {
-          public void run() {
-            try {
-              Market.installUninstall(marketEntry, marketEntry.isInstalled(), pmd);
-              Market.discoverInstalledVersion(marketEntry);
-              setButtonLabel(installedButton, marketEntry.isInstalled());
-              setPluginName(marketEntry);
-              if(upgradeButton != null) {
-                upgradeButton.setVisible(marketEntry.isInstalled());
-              }
-            }
-            catch(KettleException ke) {
-              new ErrorDialog(shell, BaseMessages.getString(MARKET_PKG, "Market.error"),
-                  BaseMessages.getString(MARKET_PKG, "Market.installUninstall.error"), ke);
-            }
+/*
+    // Create runner for installation/uninstallation
+    final ProgressMonitorRunner installRunner = new ProgressMonitorRunner(new Runnable() {
+      public void run() {
+        try {
+          Market.installUninstall(marketEntry, marketEntry.isInstalled(), pmd);
+          Market.discoverInstalledVersion(marketEntry);
+          setButtonLabel(installedButton, marketEntry.isInstalled());
+          setPluginName(marketEntry);
+          if(upgradeButton != null) {
+            upgradeButton.setVisible(marketEntry.isInstalled());
           }
-        });
-        // Create runner for market uninstallation
-        final ProgressMonitorRunner uninstallMarketRunner = new ProgressMonitorRunner(new Runnable() {
-          public void run() {
-            try {
-              Market.uninstallMarket();
-            }
-            catch(KettleException ke) {
-              new ErrorDialog(shell, BaseMessages.getString(MARKET_PKG, "Market.error"),
-                  BaseMessages.getString(MARKET_PKG, "Market.installUninstall.error"), ke);
-            }
-          }
-        });
+        }
+        catch(KettleException ke) {
+          new ErrorDialog(shell, BaseMessages.getString(MARKET_PKG, "Market.error"),
+              BaseMessages.getString(MARKET_PKG, "Market.installUninstall.error"), ke);
+        }
+      }
+    });
+    // Create runner for market uninstallation
+    final ProgressMonitorRunner uninstallMarketRunner = new ProgressMonitorRunner(new Runnable() {
+      public void run() {
+        try {
+          Market.uninstallMarket();
+        }
+        catch(KettleException ke) {
+          new ErrorDialog(shell, BaseMessages.getString(MARKET_PKG, "Market.error"),
+              BaseMessages.getString(MARKET_PKG, "Market.installUninstall.error"), ke);
+        }
+      }
+    });
 
-        installedButton.addSelectionListener(new SelectionAdapter() {
-          public void widgetSelected(SelectionEvent e) {
-            try {
-              if (marketEntry.getId().equals("market")) {
-                // prompt for a confirmation
-                MessageBox mb = new MessageBox(shell, SWT.NO | SWT.YES | SWT.ICON_WARNING);
-                // "This file already exists.  Do you want to overwrite it?"
-                mb.setMessage(BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.UninstallMarket.Message"));
-                // "This file already exists!"
-                mb.setText(BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.UninstallMarket.Title"));
-                int id = mb.open();
-                if (id == SWT.YES) {
-                  dispose();
-                  pmd.run(true, true, uninstallMarketRunner);
-                }
-              } else {
-                pmd.run(true, true, installRunner);
-              }
-            } catch (Throwable ke) {
-              new ErrorDialog(shell, BaseMessages.getString(MARKET_PKG, "Market.error"),
-                  BaseMessages.getString(MARKET_PKG, "Market.installUninstall.error"), ke);
+    installedButton.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        try {
+          if (marketEntry.getId().equals("market")) {
+            // prompt for a confirmation
+            MessageBox mb = new MessageBox(shell, SWT.NO | SWT.YES | SWT.ICON_WARNING);
+            // "This file already exists.  Do you want to overwrite it?"
+            mb.setMessage(BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.UninstallMarket.Message"));
+            // "This file already exists!"
+            mb.setText(BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.UninstallMarket.Title"));
+            int id = mb.open();
+            if (id == SWT.YES) {
+              dispose();
+              pmd.run(true, true, uninstallMarketRunner);
             }
+          } else {
+            pmd.run(true, true, installRunner);
           }
-        });
-    */
+        } catch (Throwable ke) {
+          new ErrorDialog(shell, BaseMessages.getString(MARKET_PKG, "Market.error"),
+              BaseMessages.getString(MARKET_PKG, "Market.installUninstall.error"), ke);
+        }
+      }
+    });
+*/
     Label wlName = new Label( composite, SWT.LEFT );
     props.setLook( wlName );
     wlName.setText( "Name:" );
@@ -602,7 +659,7 @@ public class MarketplaceDialog extends Dialog {
     fdlName.left = new FormAttachment( 0, 0 );
     fdlName.right = new FormAttachment( middle, 0 );
     wlName.setLayoutData( fdlName );
-    return composite;
+    return scrollBox;
   }
 
   private void addMarketPlaceEntries() {
@@ -631,6 +688,7 @@ public class MarketplaceDialog extends Dialog {
     button.setText( BaseMessages.getString( MARKET_PKG, text ) );
   }
 
+
   private void setPluginName( MarketEntry marketEntry ) {
     ExpandItem expandItem = findExpandItem( marketEntry );
     setPluginName( expandItem, marketEntry.getName(), marketEntry.isInstalled() );
@@ -640,7 +698,8 @@ public class MarketplaceDialog extends Dialog {
     if ( isInstalled ) {
       expandItem.setText( BaseMessages.getString( MARKET_PKG, "Marketplaces.Dialog.PluginInstalled.message", name ) );
     } else {
-      expandItem.setText( BaseMessages.getString( MARKET_PKG, "Marketplaces.Dialog.PluginNotInstalled.message", name ) );
+      expandItem
+        .setText( BaseMessages.getString( MARKET_PKG, "Marketplaces.Dialog.PluginNotInstalled.message", name ) );
     }
   }
 
@@ -664,7 +723,7 @@ public class MarketplaceDialog extends Dialog {
   }
 
   private Control addRightLabel( Composite composite, String string, Control lastControl ) {
-    Label label = new Label( composite, SWT.LEFT );
+    Label label = new Label( composite, SWT.WRAP | SWT.LEFT );
     props.setLook( label );
     if ( string == null ) {
       string = "null";
@@ -679,12 +738,11 @@ public class MarketplaceDialog extends Dialog {
     fdLabel.left = new FormAttachment( middle / 2, margin );
     fdLabel.right = new FormAttachment( 100, 0 );
     label.setLayoutData( fdLabel );
-
     return label;
   }
 
   private Control addRightURL( Composite composite, final String string, Control lastControl ) {
-    Link link = new Link( composite, SWT.LEFT );
+    Link link = new Link( composite, SWT.LEFT | SWT.WRAP );
     props.setLook( link );
     link.setText( "<a>" + string + "</a>" );
     FormData fdLabel = new FormData();
@@ -703,7 +761,6 @@ public class MarketplaceDialog extends Dialog {
         Spoon.getInstance().addSpoonBrowser( string, string );
       }
     } );
-
     return link;
   }
 
@@ -722,8 +779,7 @@ public class MarketplaceDialog extends Dialog {
       this.runnable = runnable;
     }
 
-    public void run( IProgressMonitor monitor ) throws InvocationTargetException, InterruptedException
-    {
+    public void run( IProgressMonitor monitor ) throws InvocationTargetException, InterruptedException {
       try {
         Spoon.getInstance().getDisplay().asyncExec( runnable );
       } catch ( Exception e ) {
