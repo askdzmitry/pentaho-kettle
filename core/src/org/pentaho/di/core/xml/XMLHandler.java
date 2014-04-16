@@ -595,6 +595,7 @@ public class XMLHandler {
       dbf = DocumentBuilderFactory.newInstance();
       dbf.setIgnoringComments( true );
       dbf.setNamespaceAware( namespaceAware );
+      dbf.setIgnoringElementContentWhitespace( true );
       db = dbf.newDocumentBuilder();
 
       // even dbf.setValidating(false) will the parser NOT prevent from checking the existance of the DTD
@@ -659,6 +660,7 @@ public class XMLHandler {
     try {
       // Check and open XML document
       dbf = DocumentBuilderFactory.newInstance();
+      dbf.setIgnoringElementContentWhitespace( true );
       db = dbf.newDocumentBuilder();
       InputStream inputStream = resource.openStream();
       try {

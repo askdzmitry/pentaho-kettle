@@ -58,6 +58,7 @@ public class MarketEntry implements XMLInterface {
   private String supportUrl;
   private String minPdiVersion;
   private String maxPdiVersion;
+  private String installationNotes;
 
   private transient boolean installed;
   private transient String installedBranch;
@@ -87,9 +88,10 @@ public class MarketEntry implements XMLInterface {
    * @param supportMessage
    * @param supportOrganization
    * @param supportUrl
+   * @param installationNotes
    */
   public MarketEntry(String id, MarketEntryType type, String name, String version, String author, String description, String documentationUrl, String sourceUrl, String forumUrl, String casesUrl, String packageUrl, String licenseName, String licenseText, SupportLevel supportLevel, String supportMessage,
-      String supportOrganization, String supportUrl, String minPdiVersion, String maxPdiVersion) throws KettleException {
+      String supportOrganization, String supportUrl, String minPdiVersion, String maxPdiVersion, String installationNotes) throws KettleException {
     this();
     this.id = id;
     this.type = type;
@@ -110,6 +112,7 @@ public class MarketEntry implements XMLInterface {
     this.supportUrl = supportUrl;
     this.minPdiVersion = minPdiVersion;
     this.maxPdiVersion = maxPdiVersion;
+    this.installationNotes = installationNotes;
 
     if (type==null) {
       throw new KettleException("The market entry type can't be null");
@@ -117,7 +120,7 @@ public class MarketEntry implements XMLInterface {
   }
 
   public MarketEntry(String id, MarketEntryType type) throws KettleException {
-    this(id, type, null, null, null, null, null, null, null, null, null, null, null, SupportLevel.NOT_SUPPORTED, null, null, null, null, null);
+    this(id, type, null, null, null, null, null, null, null, null, null, null, null, SupportLevel.NOT_SUPPORTED, null, null, null, null, null, null);
   }
 
   @Override
@@ -170,6 +173,7 @@ public class MarketEntry implements XMLInterface {
     xml.append(XMLHandler.addTagValue("support_message", supportMessage, false));
     xml.append(XMLHandler.addTagValue("support_organization", supportOrganization, false));
     xml.append(XMLHandler.addTagValue("support_url", supportUrl, false));
+    xml.append(XMLHandler.addTagValue("installation_notes", installationNotes, false));
     xml.append(XMLHandler.closeTag(XML_TAG));
     return xml.toString();
   }
@@ -203,10 +207,11 @@ public class MarketEntry implements XMLInterface {
     casesUrl = XMLHandler.getTagValue(node, "cases_url");
     licenseName = XMLHandler.getTagValue(node, "license_name");
     licenseText = XMLHandler.getTagValue(node, "license_text");
-    supportLevel = SupportLevel.getSupportLevel(XMLHandler.getTagValue(node, "support_level"));
-    supportMessage = XMLHandler.getTagValue(node, "support_message");
+    supportLevel = SupportLevel.getSupportLevel( XMLHandler.getTagValue( node, "support_level" ) );
+    supportMessage = XMLHandler.getTagValue( node, "support_message" );
     supportOrganization = XMLHandler.getTagValue(node, "support_organization");
     supportUrl = XMLHandler.getTagValue(node, "support_url");
+    installationNotes = XMLHandler.getTagValue(node, "installation_notes");
   }
 
   /**
@@ -528,4 +533,11 @@ public class MarketEntry implements XMLInterface {
       this.installedVersion = installedVersion;
   }
 
+  public String getInstallationNotes() {
+    return installationNotes;
+  }
+
+  public void setInstallationNotes( String installationNotes ) {
+    this.installationNotes = installationNotes;
+  }
 }

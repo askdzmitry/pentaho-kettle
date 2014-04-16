@@ -22,16 +22,12 @@
 
 package org.pentaho.di.ui.spoon.dialog;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-
-import java.util.Map;
-import java.util.HashMap;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ExpandEvent;
+import org.eclipse.swt.events.ExpandListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,14 +38,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
-import org.eclipse.swt.events.ExpandListener;
-import org.eclipse.swt.events.ExpandEvent;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -68,6 +64,11 @@ import org.pentaho.di.ui.core.gui.GUIResource;
 import org.pentaho.di.ui.core.gui.WindowProperty;
 import org.pentaho.di.ui.spoon.Spoon;
 import org.pentaho.di.ui.trans.step.BaseStepDialog;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MarketplaceDialog extends Dialog {
   private static Class<?> MARKET_PKG = Market.class; // for i18n purposes, needed by Translator2!!
@@ -390,10 +391,25 @@ public class MarketplaceDialog extends Dialog {
     return expandItem;
   }
 
+  private Composite createFieldsSection(final MarketEntry marketEntry) {
+
+    GridData gridData = new GridData();
+    GridLayout layout = new GridLayout( 2, false );
+    layout.marginHeight = margin;
+    layout.marginHeight = margin;
+    layout.marginWidth = margin;
+
+    final Composite composite = new Composite(expandBar, SWT.NONE);
+    composite.setData("marketEntry", marketEntry);
+    return composite;
+  }
+
+
   private Composite createMarketEntryControl(final MarketEntry marketEntry){
     final Composite composite = new Composite(expandBar, SWT.NONE);
     composite.setData("marketEntry", marketEntry);
     FormLayout layout = new FormLayout();
+//    GridLayout layout = new GridLayout( 2, false );
     layout.marginHeight = margin;
     layout.marginWidth = margin;
     composite.setLayout(layout);
@@ -411,6 +427,19 @@ public class MarketplaceDialog extends Dialog {
     // The version
     addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.AvailableVersion.label"), lastControl);
     lastControl = addRightLabel(composite, Const.NVL(marketEntry.getVersion(), ""), lastControl);
+    // The minimum PDI version
+    if (!Const.isEmpty(marketEntry.getMinPdiVersion())) {
+      System.out.println(Const.NVL(marketEntry.getName(), "") + "No "+ marketEntry.getMinPdiVersion());
+      addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.MinPdiVersion.label"), lastControl);
+      lastControl = addRightLabel(composite, Const.NVL(marketEntry.getMinPdiVersion(), ""), lastControl);
+    }
+    // The maximum PDI version
+    if (!Const.isEmpty(marketEntry.getMaxPdiVersion())) {
+      System.out.println(Const.NVL(marketEntry.getName(), "") + "No "+ marketEntry.getMaxPdiVersion());
+      addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.MaxPdiVersion.label"), lastControl);
+      lastControl = addRightLabel(composite, Const.NVL(marketEntry.getMaxPdiVersion(), ""), lastControl);
+    }
+
     // The author
     if (!Const.isEmpty(marketEntry.getAuthor())) {
       addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.Author.label"), lastControl);
@@ -465,6 +494,12 @@ public class MarketplaceDialog extends Dialog {
       addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.SupportURL.label"), lastControl);
       lastControl = addRightURL(composite, marketEntry.getSupportUrl(), lastControl);
     }
+    // The installation notes
+    if (!Const.isEmpty(marketEntry.getInstallationNotes())) {
+      addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.InstallationNotes.label"), lastControl);
+      lastControl = addRightLabel(composite, marketEntry.getInstallationNotes(), lastControl);
+    }
+
 
     Market.discoverInstalledVersion(marketEntry);
 
@@ -472,6 +507,7 @@ public class MarketplaceDialog extends Dialog {
       addLeftLabel(composite, BaseMessages.getString(MARKET_PKG, "MarketplacesDialog.InstalledVersion.label"), lastControl);
       lastControl = addRightLabel(composite, marketEntry.getInstalledVersion(), lastControl);
     }
+
 
     final Button installedButton = new Button(composite, SWT.PUSH);
     installedButton.setData("id", "installedButton");
@@ -528,6 +564,7 @@ public class MarketplaceDialog extends Dialog {
 	    });
     */
 
+    // TEST
     BaseStepDialog.positionBottomButtons(composite, new Button[] {installedButton,  upgradeButton}, margin, lastControl);
     boolean showUpgradeButton = marketEntry.isInstalled() &&
         ( marketEntry.getInstalledVersion()==null ||
@@ -593,6 +630,7 @@ public class MarketplaceDialog extends Dialog {
       }
     });
 */
+    // TEST
     Label wlName = new Label(composite, SWT.LEFT);
     props.setLook(wlName);
     wlName.setText("Name:");
@@ -646,7 +684,8 @@ public class MarketplaceDialog extends Dialog {
   }
 	
   private void addLeftLabel(Composite composite, String string, Control lastControl) {
-    Label label = new Label(composite, SWT.RIGHT);
+    System.out.println("addLeftLabel - 0");
+    Label label = new Label(composite, SWT.RIGHT );
     props.setLook(label);
     if (string == null) {
       string = "null";
@@ -661,11 +700,16 @@ public class MarketplaceDialog extends Dialog {
     }
     fdLabel.left = new FormAttachment(0, 0);
     fdLabel.right = new FormAttachment(middle/2, 0);
+//    GridData fdLabel = new GridData( GridData.HORIZONTAL_ALIGN_END );
+//    GridData fdLabel = new GridData( SWT.END, SWT.TOP, true, false );
+//    fdLabel.horizontalAlignment = GridData.HORIZONTAL_ALIGN_END;
     label.setLayoutData(fdLabel);
+    System.out.println("addLeftLabel - 1");
   }
 
   private Control addRightLabel(Composite composite, String string, Control lastControl) {
-    Label label = new Label(composite, SWT.LEFT);
+    System.out.println("addRightLabel - 0");
+    Label label = new Label(composite, SWT.WRAP | SWT.LEFT );
     props.setLook(label);
     if (string == null) {
       string = "null";
@@ -678,13 +722,17 @@ public class MarketplaceDialog extends Dialog {
       fdLabel.top = new FormAttachment(0, 0);
     }
     fdLabel.left = new FormAttachment(middle/2, margin);
-    fdLabel.right = new FormAttachment(100, 0);
+    fdLabel.right = new FormAttachment(120, 0);
+//    GridData fdLabel = new GridData( GridData.HORIZONTAL_ALIGN_BEGINNING );
+//    GridData fdLabel = new GridData( SWT.FILL, SWT.TOP, true, false );
+//    fdLabel.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
     label.setLayoutData(fdLabel);
-
+    System.out.println("addRightLabel - 1");
     return label;
   }
 
   private Control addRightURL(Composite composite, final String string, Control lastControl) {
+    System.out.println("addRightURL - 0");
     Link link = new Link(composite, SWT.LEFT);
     props.setLook(link);
     link.setText("<a>"+string+"</a>");
@@ -695,7 +743,10 @@ public class MarketplaceDialog extends Dialog {
       fdLabel.top = new FormAttachment(0, 0);
     }
     fdLabel.left = new FormAttachment(middle/2, margin);
-    fdLabel.right = new FormAttachment(100, 0);
+    fdLabel.right = new FormAttachment(120, 0);
+//    GridData fdLabel = new GridData( GridData.HORIZONTAL_ALIGN_BEGINNING );
+//    GridData fdLabel = new GridData( SWT.FILL, SWT.TOP, true, false );
+//    fdLabel.horizontalAlignment = GridData.HORIZONTAL_ALIGN_BEGINNING;
     link.setLayoutData(fdLabel);
 
     link.addSelectionListener(new SelectionAdapter() {
@@ -704,7 +755,7 @@ public class MarketplaceDialog extends Dialog {
         Spoon.getInstance().addSpoonBrowser(string, string);
       }
     });
-
+    System.out.println("addRightURL - 1");
     return link;
   }
 

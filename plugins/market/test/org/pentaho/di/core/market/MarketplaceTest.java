@@ -57,11 +57,13 @@ public class MarketplaceTest extends TestCase {
   private static final String supportUrl = "http://www.pentaho.com/services/support/pdi";
   private static final String minPdiVersion = "4.3.0";
   private static final String maxPdiVersion = "4.9";
+  private static final String installationNotes = "This plugin copies a version of libpensol.*.jar to the server's WEB-INF/lib.";
 
   public void testMarketEntryCreation() throws Exception {
     MarketEntry entry = new MarketEntry(ID, type, name, version, author, description,
         documentationUrl, sourceUrl, forumUrl, casesUrl, packageUrl,
-        licenseName, licenseText, supportLevel, supportMessage, supportOrganization, supportUrl, minPdiVersion, maxPdiVersion);
+        licenseName, licenseText, supportLevel, supportMessage,
+        supportOrganization, supportUrl, minPdiVersion, maxPdiVersion, installationNotes);
 
     assertEquals(ID, entry.getId());
     assertEquals(type, entry.getType());
@@ -82,12 +84,15 @@ public class MarketplaceTest extends TestCase {
     assertEquals(supportUrl, entry.getSupportUrl());
     assertEquals(minPdiVersion, entry.getMinPdiVersion());
     assertEquals(maxPdiVersion, entry.getMaxPdiVersion());
+    assertEquals(installationNotes, entry.getInstallationNotes());
+
   }
 
   public void testMarketEntrySerialization() throws Exception {
     MarketEntry originalEntry = new MarketEntry(ID, type, name, version, author, description,
         documentationUrl, sourceUrl, forumUrl, casesUrl, packageUrl,
-        licenseName, licenseText, supportLevel, supportMessage, supportOrganization, supportUrl, minPdiVersion, maxPdiVersion);
+        licenseName, licenseText, supportLevel, supportMessage,
+        supportOrganization, supportUrl, minPdiVersion, maxPdiVersion, installationNotes);
 
     // Serialize & de-serialize and then see if we still have the same content.
     //
@@ -114,5 +119,6 @@ public class MarketplaceTest extends TestCase {
     assertEquals(supportUrl, entry.getSupportUrl());
     assertEquals(minPdiVersion, entry.getMinPdiVersion());
     assertEquals(maxPdiVersion, entry.getMaxPdiVersion());
+    assertEquals(installationNotes, entry.getInstallationNotes());
   }
 }
