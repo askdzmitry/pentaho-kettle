@@ -54,6 +54,7 @@ public class MarketEntries extends ArrayList<MarketEntry> {
         for ( Node entryNode : entryNodes ) {
           MarketEntry entry = new MarketEntry( entryNode );
           if ( entry.getType() != null && entry.getType() != MarketEntryType.Platform ) {
+            XMLHandler.stripDuplicatedWhitespaces( entryNode );
             add( new MarketEntry( entryNode ) );
           }
         }

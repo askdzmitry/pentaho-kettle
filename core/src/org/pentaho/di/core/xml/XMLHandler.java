@@ -713,7 +713,8 @@ public class XMLHandler {
    *          true to defer node expansion, false to not defer.
    * @return the Document if all went well, null if an error occurred!
    */
-  public static final Document loadXMLString( String string, Boolean namespaceAware, Boolean deferNodeExpansion ) throws KettleXMLException {
+  public static final Document loadXMLString( String string, Boolean namespaceAware, Boolean deferNodeExpansion )
+    throws KettleXMLException {
     DocumentBuilderFactory dbf;
     DocumentBuilder db;
     Document doc;
@@ -756,9 +757,9 @@ public class XMLHandler {
    * @return The XML String for the tag.
    */
   public static final String addTagValue( String tag, String val, boolean cr, String... attributes ) {
-    StringBuffer value;
+    StringBuilder value;
     Encoder encoder = ESAPI.encoder();
-    value = new StringBuffer( "<" );
+    value = new StringBuilder( "<" );
     value.append( tag );
 
     for ( int i = 0; i < attributes.length; i += 2 ) {
@@ -1185,7 +1186,7 @@ public class XMLHandler {
   }
 
   public static String buildCDATA( String string ) {
-    StringBuffer cdata = new StringBuffer( "<![CDATA[" );
+    StringBuilder cdata = new StringBuilder( "<![CDATA[" );
     cdata.append( Const.NVL( string, "" ) ).append( "]]>" );
     return cdata.toString();
   }
@@ -1210,6 +1211,26 @@ public class XMLHandler {
     return sw.toString();
   }
 
+  /**
+   * This method replace all whitespace characters (\t \n \x0b \r \f) by whitespace and removes duplicated whitespaces
+   * recursively in text nodes. It leaves CDATA nodes unmodified.
+   *
+   * @param node
+   * @return
+   */
+  public static void stripDuplicatedWhitespaces( Node node ) {
+    if ( node == null || node.getChildNodes() == null ) {
+      return;
+    }
+    if ( node.getNodeType() == Node.TEXT_NODE ) {
+      node.setNodeValue( node.getNodeValue().replaceAll( "\\s{1,}", " " ) );
+    } else if ( node.hasChildNodes() ) {
+      NodeList children = node.getChildNodes();
+      for ( int i = 0; i < children.getLength(); i++ ) {
+        stripDuplicatedWhitespaces( children.item( i ) );
+      }
+    }
+  }
 }
 
 /**
