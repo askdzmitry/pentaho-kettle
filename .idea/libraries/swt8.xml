@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="swt8">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/osx/swt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

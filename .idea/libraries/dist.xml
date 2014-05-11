@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="dist">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-gpload-plugin/dist/kettle-gpload-plugin-TRUNK-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-gpload-plugin/dist/kettle-gpload-plugin-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-gpload-plugin/dist/kettle-gpload-plugin-TRUNK-SNAPSHOT.zip!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-gpload-plugin/dist/kettle-gpload-plugin-TRUNK-SNAPSHOT-sources.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

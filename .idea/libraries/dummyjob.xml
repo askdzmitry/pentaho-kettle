@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="dummyjob">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/assembly/package-res/plugins/jobentries/DummyJob/dummyjob.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

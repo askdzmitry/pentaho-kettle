@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="libswt">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/commands.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/libswt/runtime.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/libswt/jface.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/libswt/common.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

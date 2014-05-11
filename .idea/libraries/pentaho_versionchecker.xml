@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="pentaho-versionchecker">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/assembly/package-res/plugins/versioncheck/lib/pentaho-versionchecker.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

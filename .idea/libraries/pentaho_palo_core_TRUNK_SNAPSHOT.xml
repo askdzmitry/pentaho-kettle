@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="pentaho-palo-core-TRUNK-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/kettle-palo-plugin/lib/pentaho-palo-core-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

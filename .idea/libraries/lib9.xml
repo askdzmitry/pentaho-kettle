@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="lib9">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v23-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v25-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v21-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-base-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-examples-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v26-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v251-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v231-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v24-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/lib/hapi-structures-v22-1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

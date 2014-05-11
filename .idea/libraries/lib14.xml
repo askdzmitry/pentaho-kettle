@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="lib14">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-cassandra-plugin/lib/cassandra-all-1.2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-cassandra-plugin/lib/snakeyaml-1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-cassandra-plugin/lib/cassandra-thrift-1.2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-cassandra-plugin/lib/guava-13.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-cassandra-plugin/lib/libthrift-0.7.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kettle5-log4j-plugin-TRUNK-SNAPSHOT1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/kettle5-log4j-plugin/kettle5-log4j-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

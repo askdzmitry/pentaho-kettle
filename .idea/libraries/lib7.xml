@@ -1,0 +1,29 @@
+<component name="libraryTable">
+  <library name="lib7">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/core/lib/secondstring-20060615.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/dom4j-1.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/jug-lgpl-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/jetty-6.1.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-logging-1.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-lang-2.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/jsch-0.1.46.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/javassist-3.12.1.GA.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-beanutils-1.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-codec-1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/scannotation-1.0.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/ognl-2.6.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-vfs-20100924-pentaho.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/metastore-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-compress-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-io-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-collections-3.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-pool-1.5.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/esapi-2.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-dbcp-1.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/lib/commons-httpclient-3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

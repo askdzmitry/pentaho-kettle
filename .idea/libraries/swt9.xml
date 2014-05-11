@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="swt9">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/aix/swt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

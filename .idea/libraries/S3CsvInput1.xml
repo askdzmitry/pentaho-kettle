@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="S3CsvInput1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/steps/S3CsvInput/jets3t-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/steps/S3CsvInput/s3csvinput.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

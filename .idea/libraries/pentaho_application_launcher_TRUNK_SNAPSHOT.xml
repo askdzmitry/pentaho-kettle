@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="pentaho-application-launcher-TRUNK-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/launcher/pentaho-application-launcher-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

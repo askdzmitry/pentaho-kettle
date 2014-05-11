@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="swt2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/win32/swt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kettle-palo-plugin-TRUNK-SNAPSHOT1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-palo-plugin/bin/stage/kettle-palo-plugin/kettle-palo-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

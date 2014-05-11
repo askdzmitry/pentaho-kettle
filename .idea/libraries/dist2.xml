@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="dist2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-palo-plugin/dist/kettle-palo-plugin-TRUNK-SNAPSHOT.zip!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-palo-plugin/dist/kettle-palo-plugin-TRUNK-SNAPSHOT-sources.zip!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-palo-plugin/dist/kettle-palo-plugin-TRUNK-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-palo-plugin/dist/kettle-palo-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

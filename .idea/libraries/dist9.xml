@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="dist9">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ui/dist/kettle-ui-swt-TRUNK-SNAPSHOT-sources.zip!/" />
+      <root url="jar://$PROJECT_DIR$/ui/dist/kettle-ui-swt-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ui/dist/kettle-ui-swt-TRUNK-SNAPSHOT-sources.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

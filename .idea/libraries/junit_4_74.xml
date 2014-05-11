@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="junit-4.74">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dbdialog/test-lib/junit-4.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

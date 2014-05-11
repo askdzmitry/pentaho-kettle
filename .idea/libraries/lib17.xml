@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="lib17">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-serde-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-metastore-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/sqoop-1.4.2-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/pig-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/datanucleus-core-2.0.3-ZD5977-CDH5293.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-service-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-common-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-builtins-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-exec-0.10.0-cdh4.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/pentaho-hadoop-shims-cdh42-mapred-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/hive-jdbc-cdh4.2.0-release-pentaho-5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/pentaho-hdfs-vfs-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/lib/automaton-1.11-8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

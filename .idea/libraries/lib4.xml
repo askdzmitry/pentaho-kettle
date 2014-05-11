@@ -1,0 +1,29 @@
+<component name="libraryTable">
+  <library name="lib4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/slf4j-api-1.7.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/aws-java-sdk-1.0.008.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/libthrift-0.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/kettle5-log4j-plugin-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/metastore-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/high-scale-lib-1.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/jets3t-0.7.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/oozie-core-3.1.3-incubating.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/xstream-1.4.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/jackson-core-asl-1.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/jackson-mapper-asl-1.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/avro-1.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/json-simple-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/xpp3_min-1.1.4c.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/pentaho-hadoop-shims-api-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/slf4j-log4j12-1.7.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/commons-cli-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/xmlpull-1.1.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/oozie-client-3.1.3-incubating.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/jline-0.9.94.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/lib/pentaho-s3-vfs-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

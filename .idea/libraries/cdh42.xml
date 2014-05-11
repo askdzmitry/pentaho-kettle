@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="cdh42">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/pentaho-hadoop-shims-cdh42-hbase-comparators-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh42/pentaho-hadoop-shims-cdh42-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

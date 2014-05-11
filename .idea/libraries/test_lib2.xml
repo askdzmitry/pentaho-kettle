@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="test-lib2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ui/test-lib/junit-4.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ui/test-lib/mockito-all-1.9.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

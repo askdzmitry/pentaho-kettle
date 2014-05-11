@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="mr2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-mapreduce-client-jobclient-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-mapreduce-client-common-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-yarn-client-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-yarn-server-common-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-mapreduce-client-shuffle-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-yarn-api-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-mapreduce-client-app-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-mapreduce-client-core-2.3.0-cdh5.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr2/hadoop-yarn-common-2.3.0-cdh5.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

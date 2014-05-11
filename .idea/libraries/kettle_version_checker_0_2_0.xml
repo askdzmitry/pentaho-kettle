@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kettle-version-checker-0.2.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/versioncheck/kettle-version-checker-0.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

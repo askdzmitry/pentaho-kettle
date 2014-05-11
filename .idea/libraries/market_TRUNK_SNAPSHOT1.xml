@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="market-TRUNK-SNAPSHOT1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/market/bin/stage/market/market-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

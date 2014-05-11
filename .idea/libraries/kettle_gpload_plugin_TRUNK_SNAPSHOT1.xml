@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kettle-gpload-plugin-TRUNK-SNAPSHOT1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/kettle-gpload-plugin/kettle-gpload-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

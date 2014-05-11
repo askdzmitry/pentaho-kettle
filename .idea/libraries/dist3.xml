@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="dist3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle5-log4j-plugin/dist/kettle5-log4j-plugin-TRUNK-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle5-log4j-plugin/dist/kettle5-log4j-plugin-TRUNK-SNAPSHOT.zip!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle5-log4j-plugin/dist/kettle5-log4j-plugin-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle5-log4j-plugin/dist/kettle5-log4j-plugin-TRUNK-SNAPSHOT-sources.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

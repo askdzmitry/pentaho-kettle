@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="swt12">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/hpux/swt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

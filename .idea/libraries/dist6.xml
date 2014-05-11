@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="dist6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/dist/kettle-hl7-plugin-TRUNK-SNAPSHOT-sources.zip!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/dist/kettle-hl7-plugin-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/dist/kettle-hl7-plugin-TRUNK-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-hl7-plugin/dist/kettle-hl7-plugin-TRUNK-SNAPSHOT.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

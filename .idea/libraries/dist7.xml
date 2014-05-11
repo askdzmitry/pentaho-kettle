@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="dist7">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/core/dist/kettle-core-TRUNK-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/dist/kettle-core-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/dist/kettle-core-TRUNK-SNAPSHOT-sources.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

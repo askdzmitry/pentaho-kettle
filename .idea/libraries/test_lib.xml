@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="test-lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/core/test-lib/javassist-3.12.1.GA.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/test-lib/junit-4.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/core/test-lib/mockito-all-1.9.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="swt5">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/aix64/swt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

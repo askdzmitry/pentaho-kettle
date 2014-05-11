@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="pentaho-big-data-plugin">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/pentaho-mapreduce-libraries.zip!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/pentaho-big-data-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="pmr1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hdp20/lib/pmr/hbase-hadoop-compat-0.96.0.2.0.6.0-76-hadoop2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hdp20/lib/pmr/protobuf-java-2.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hdp20/lib/pmr/zookeeper-3.4.5.2.0.6.0-76.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

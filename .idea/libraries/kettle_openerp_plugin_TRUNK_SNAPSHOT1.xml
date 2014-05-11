@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kettle-openerp-plugin-TRUNK-SNAPSHOT1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle-openerp-plugin/bin/stage/kettle-openerp-plugin/kettle-openerp-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

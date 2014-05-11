@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="lib18">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/hive-jdbc-0.7.0-pentaho-1.0.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/pig-0.8.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/hive-metastore-0.7.0-pentaho-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/libfb303-0.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/pentaho-hdfs-vfs-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/hive-exec-0.7.0-pentaho-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/pentaho-hadoop-snappy-0.0.1-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/pentaho-hadoop-shims-hadoop-20-mapred-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/hive-service-0.7.0-pentaho-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/libthrift-0.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/hadoop-20/lib/sqoop-1.4.1-incubating-hadoop-20.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="dist1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dbdialog/dist/kettle-dbdialog-TRUNK-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dbdialog/dist/kettle-dbdialog-TRUNK-SNAPSHOT-sources.zip!/" />
+      <root url="jar://$PROJECT_DIR$/dbdialog/dist/kettle-dbdialog-TRUNK-SNAPSHOT-sources.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="junit-4.73">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/plugins/kettle5-log4j-plugin/test-lib/junit-4.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

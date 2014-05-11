@@ -1,8 +1,6 @@
 package org.pentaho.di.core.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -11,6 +9,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import static org.junit.Assert.*;
 
 public class DatabaseMetaTest {
   @Test
@@ -49,4 +50,24 @@ public class DatabaseMetaTest {
     String access = DatabaseMeta.getAccessTypeDesc( DatabaseMeta.getAccessType( expectedJndi ) );
     assertEquals( expectedJndi, access );
   }
+
+  @Test
+  public void testCheckParametersSAPR3DatabaseMeta() {
+    testCheckParams( Mockito.mock( SAPDBDatabaseMeta.class ) );
+  }
+
+  @Test
+  public void testCheckParametersGenericDatabaseMeta() {
+    testCheckParams( Mockito.mock( GenericDatabaseMeta.class ) );
+  }
+
+  private void testCheckParams( DatabaseInterface databaseInterface ) {
+    DatabaseMeta dbMeta = new DatabaseMeta();
+    dbMeta.setDatabaseInterface( databaseInterface );
+
+    String[] params = dbMeta.checkParameters();
+    String remark = "Please specify the name of the database";
+    assertFalse( Arrays.asList( params ).contains( remark ) );
+  }
+
 }

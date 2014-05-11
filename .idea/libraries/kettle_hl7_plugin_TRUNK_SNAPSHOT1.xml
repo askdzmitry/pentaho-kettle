@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kettle-hl7-plugin-TRUNK-SNAPSHOT1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/kettle-hl7-plugin/kettle-hl7-plugin-TRUNK-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

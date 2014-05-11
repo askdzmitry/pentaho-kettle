@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="swt6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/libswt/linux/ppc64/swt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

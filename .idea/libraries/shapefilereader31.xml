@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="shapefilereader31">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/steps/ShapeFileReader3/shapefilereader3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

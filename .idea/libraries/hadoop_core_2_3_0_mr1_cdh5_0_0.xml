@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="hadoop-core-2.3.0-mr1-cdh5.0.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/plugins/pentaho-big-data-plugin/hadoop-configurations/cdh50/lib/client/mr1/hadoop-core-2.3.0-mr1-cdh5.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
