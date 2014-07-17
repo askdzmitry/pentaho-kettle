@@ -885,6 +885,11 @@ public class RepositoryImporter implements IRepositoryImporter, CanLimitDirs {
     return true;
   }
 
+  @Override
+  public boolean aclElementRead( String xml, RepositoryImportFeedbackInterface feedback ) {
+    throw new UnsupportedOperationException(  );
+  }
+
   private RepositoryDirectoryInterface getTargetDirectory( String directoryPath, String dirOverride,
       RepositoryImportFeedbackInterface feedback ) throws KettleException {
     RepositoryDirectoryInterface targetDirectory = null;

@@ -29,5 +29,7 @@ public interface RepositoryElementReadListener {
 
   public boolean jobElementRead( String xml, RepositoryImportFeedbackInterface feedback );
 
+  public boolean aclElementRead( String xml, RepositoryImportFeedbackInterface feedback );
+
   public void fatalXmlErrorEncountered( SAXParseException e );
 }

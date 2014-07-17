@@ -40,6 +40,9 @@ public class RepositoryExportSaxParser extends DefaultHandler2 {
   public static final String STRING_TRANSFORMATION = "transformation";
   public static final String STRING_JOBS = "jobs";
   public static final String STRING_JOB = "job";
+  public static final String STRING_ACLS = "acls";
+  public static final String STRING_ACL = "acl";
+
 
   private SAXParserFactory factory;
   private SAXParser saxParser;
@@ -70,7 +73,8 @@ public class RepositoryExportSaxParser extends DefaultHandler2 {
   }
 
   public void startElement( String uri, String localName, String qName, Attributes attributes ) throws SAXException {
-    if ( STRING_REPOSITORY.equals( qName ) || STRING_TRANSFORMATIONS.equals( qName ) || STRING_JOBS.equals( qName ) ) {
+    if ( STRING_REPOSITORY.equals( qName ) || STRING_TRANSFORMATIONS.equals( qName ) || STRING_JOBS.equals( qName )
+      || STRING_ACLS.equals( qName ) ) {
       add = false;
     } else {
       add = true;
@@ -78,9 +82,8 @@ public class RepositoryExportSaxParser extends DefaultHandler2 {
 
     if ( add ) {
 
-      // A new job or transformation?
-      //
-      if ( STRING_TRANSFORMATION.equals( qName ) || STRING_JOB.equals( qName ) ) {
+      // A new job/transformation/acl?
+      if ( STRING_TRANSFORMATION.equals( qName ) || STRING_JOB.equals( qName ) || STRING_ACL.equals( qName ) ) {
         xml.setLength( 0 );
       }
 
@@ -104,6 +107,13 @@ public class RepositoryExportSaxParser extends DefaultHandler2 {
         saxParser.reset();
       }
     }
+
+    if ( STRING_ACL.equals( qName ) ) {
+      if ( !repositoryElementReadListener.aclElementRead( xml.toString(), feedback ) ) {
+        saxParser.reset();
+      }
+    }
+
   }
 
   public void startCDATA() throws SAXException {
